@@ -43,7 +43,7 @@ class FisightApplicationTests {
         given(accountRepository.findAll()).willReturn(Flux.just(*accounts))
 
         client.get()
-                .uri("/accounts/")
+                .uri("/accounts")
                 .exchange()
                 .expectStatus().isOk
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)

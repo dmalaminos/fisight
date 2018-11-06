@@ -14,7 +14,7 @@ class AccountRouter {
     @Bean
     fun route(handler: AccountHandler) = router {
         "/accounts".nest {
-            GET("/", handler::getAll)
+            GET("", handler::getAll)
         }
         GET("/status") { ServerResponse.ok().contentType(MediaType.TEXT_PLAIN).body(fromObject("Up and running!")) }
     }
