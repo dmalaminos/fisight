@@ -2,6 +2,7 @@ package com.fisight.fisight
 
 import com.fisight.fisight.account.Account
 import com.fisight.fisight.account.AccountRepository
+import org.hamcrest.Matchers
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -13,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Flux
 
 @RunWith(SpringRunner::class)
@@ -50,5 +52,15 @@ class FisightApplicationTests {
                 .expectBodyList(Account::class.java)
                 .hasSize(2)
                 .contains(*accounts)
+    }
+
+    @Test
+    fun createAccount() {
+        client.post()
+                .uri("/accounts")
+                .body(BodyInserters.fromObject(Account("1234", "Main", "Bankster", 3000)))
+                .exchange()
+                .expectStatus().isCreated
+                .expectHeader().value("Location", Matchers.`is`("/accounts/1234"))
     }
 }
