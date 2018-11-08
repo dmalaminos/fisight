@@ -6,6 +6,7 @@ import org.hamcrest.Matchers
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
@@ -16,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
 @RunWith(SpringRunner::class)
 @SpringBootTest
@@ -56,9 +58,12 @@ class FisightApplicationTests {
 
     @Test
     fun createAccount() {
+        val account = Account("1234", "Main", "Bankster", 3000)
+        given(accountRepository.insert(ArgumentMatchers.any<Mono<Account>>())).willReturn(Flux.just(account))
+
         client.post()
                 .uri("/accounts")
-                .body(BodyInserters.fromObject(Account("1234", "Main", "Bankster", 3000)))
+                .body(BodyInserters.fromObject(account))
                 .exchange()
                 .expectStatus().isCreated
                 .expectHeader().value("Location", Matchers.`is`("/accounts/1234"))
