@@ -15,6 +15,7 @@ class AccountRouter {
         "/accounts".nest {
             GET("", handler::getAll)
             POST("", handler::save)
+            PUT("/{id}", handler::update)
         }
         GET("/status") { ServerResponse.ok().contentType(MediaType.TEXT_PLAIN).body(fromObject("Up and running!")) }
     }

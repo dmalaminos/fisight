@@ -68,4 +68,29 @@ class FisightApplicationTests {
                 .expectStatus().isCreated
                 .expectHeader().value("Location", Matchers.`is`("/accounts/1234"))
     }
+
+    @Test
+    fun updateAccount() {
+        val account = Account("1234", "Main", "Bankster", 3000)
+        given(accountRepository.findById("1234")).willReturn(Mono.just(account))
+        given(accountRepository.save(account)).willReturn(Mono.just(account))
+
+        client.put()
+                .uri("/accounts/1234")
+                .body(BodyInserters.fromObject(account))
+                .exchange()
+                .expectStatus().isOk
+    }
+
+    @Test
+    fun cannotUpdateAccount_whenUrlIdDoesNotMatchBodyId() {
+        val account = Account("1234", "Main", "Bankster", 3000)
+        given(accountRepository.findById("123")).willReturn(Mono.just(account))
+
+        client.put()
+                .uri("/accounts/123")
+                .body(BodyInserters.fromObject(account))
+                .exchange()
+                .expectStatus().isBadRequest
+    }
 }

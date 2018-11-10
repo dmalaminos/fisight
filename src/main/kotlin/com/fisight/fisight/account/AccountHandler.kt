@@ -21,4 +21,17 @@ class AccountHandler(private val accountRepository: AccountRepository) {
                 .flatMap { ServerResponse.created(UriComponentsBuilder.fromPath("/accounts/{id}").buildAndExpand(it.id).toUri() ).build()}
                 .toMono()
     }
+
+    fun update(request: ServerRequest): Mono<ServerResponse> {
+        val requestedId = request.pathVariable("id")
+        val updatedAccount = request.bodyToMono(Account::class.java)
+
+        return updatedAccount
+                .filter { it.id == requestedId }
+                .flatMap { accountRepository.save(it) }
+                .flatMap { ServerResponse.ok().build() }
+                .switchIfEmpty(ServerResponse.badRequest().build())
+                .toMono()
+
+    }
 }
