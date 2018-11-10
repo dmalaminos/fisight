@@ -1,5 +1,6 @@
 package com.fisight.fisight.account
 
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -17,8 +18,10 @@ class AccountHandler(private val accountRepository: AccountRepository) {
         val newAccount = request.bodyToMono(Account::class.java)
         //TODO: input validation
         //TODO: add host to created location builder
-        return accountRepository.insert(newAccount)
-                .flatMap { ServerResponse.created(UriComponentsBuilder.fromPath("/accounts/{id}").buildAndExpand(it.id).toUri() ).build()}
+        return newAccount
+                .flatMap { accountRepository.insert(it) }
+                .flatMap { ServerResponse.created(UriComponentsBuilder.fromPath("/accounts/{id}").buildAndExpand(it.id).toUri() ).build() }
+                .onErrorResume { ServerResponse.status(HttpStatus.CONFLICT).build() }
                 .toMono()
     }
 
@@ -32,6 +35,5 @@ class AccountHandler(private val accountRepository: AccountRepository) {
                 .flatMap { ServerResponse.ok().build() }
                 .switchIfEmpty(ServerResponse.badRequest().build())
                 .toMono()
-
     }
 }

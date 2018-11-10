@@ -1,9 +1,7 @@
-package com.fisight.fisight
+package com.fisight.fisight.account
 
-import com.fisight.fisight.account.Account
-import com.fisight.fisight.account.AccountRepository
+import com.mongodb.MongoWriteException
 import org.hamcrest.Matchers
-import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
@@ -12,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -22,25 +21,15 @@ import reactor.core.publisher.Mono
 @RunWith(SpringRunner::class)
 @SpringBootTest
 @AutoConfigureWebTestClient
-class FisightApplicationTests {
+class AccountTests {
     @Autowired
     private lateinit var client: WebTestClient
 
     @MockBean
     private lateinit var accountRepository: AccountRepository
 
-	@Test
-	fun getStatus() {
-        client.get()
-                .uri("/status")
-                .exchange()
-                .expectStatus().isOk
-                .expectBody(String::class.java)
-                .returnResult().apply { assertEquals("Up and running!", responseBody) }
-    }
-
     @Test
-    fun getAccounts() {
+    fun canGetExistingAccounts() {
         val accounts = arrayOf(
                 Account("1", "Main", "Bankster", 3000),
                 Account("2", "Savings", "Altbank", 7000))
@@ -59,7 +48,7 @@ class FisightApplicationTests {
     @Test
     fun createAccount() {
         val account = Account("1234", "Main", "Bankster", 3000)
-        given(accountRepository.insert(ArgumentMatchers.any<Mono<Account>>())).willReturn(Flux.just(account))
+        given(accountRepository.insert(ArgumentMatchers.any<Account>())).willReturn(Mono.just(account))
 
         client.post()
                 .uri("/accounts")
@@ -70,7 +59,18 @@ class FisightApplicationTests {
     }
 
     @Test
-    fun updateAccount() {
+    fun cannotCreateAccount_whenIdAlreadyExists() {
+        given(accountRepository.insert(ArgumentMatchers.any<Mono<Account>>())).willThrow(MongoWriteException::class.java)
+
+        client.post()
+                .uri("/accounts")
+                .body(BodyInserters.fromObject(Account("1234", "Main", "Bankster", 3000)))
+                .exchange()
+                .expectStatus().isEqualTo(HttpStatus.CONFLICT)
+    }
+
+    @Test
+    fun canUpdateAccount() {
         val account = Account("1234", "Main", "Bankster", 3000)
         given(accountRepository.findById("1234")).willReturn(Mono.just(account))
         given(accountRepository.save(account)).willReturn(Mono.just(account))
