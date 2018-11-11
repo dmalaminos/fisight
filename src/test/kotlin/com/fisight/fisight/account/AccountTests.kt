@@ -1,5 +1,6 @@
 package com.fisight.fisight.account
 
+import com.fisight.fisight.capital.Capital
 import com.mongodb.MongoWriteException
 import org.hamcrest.Matchers
 import org.junit.Test
@@ -31,8 +32,8 @@ class AccountTests {
     @Test
     fun canGetExistingAccounts() {
         val accounts = arrayOf(
-                Account("1", "Main", "Bankster", 3000),
-                Account("2", "Savings", "Altbank", 7000))
+                Account("1", "Main", "Bankster", Capital(3000)),
+                Account("2", "Savings", "Altbank", Capital(7000)))
         given(accountRepository.findAll()).willReturn(Flux.just(*accounts))
 
         client.get()
@@ -47,7 +48,7 @@ class AccountTests {
 
     @Test
     fun canCreateAccount() {
-        val account = Account("1234", "Main", "Bankster", 3000)
+        val account = Account("1234", "Main", "Bankster", Capital(3000))
         given(accountRepository.insert(ArgumentMatchers.any<Account>())).willReturn(Mono.just(account))
 
         client.post()
@@ -64,14 +65,14 @@ class AccountTests {
 
         client.post()
                 .uri("/accounts")
-                .body(BodyInserters.fromObject(Account("1234", "Main", "Bankster", 3000)))
+                .body(BodyInserters.fromObject(Account("1234", "Main", "Bankster", Capital(3000))))
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.CONFLICT)
     }
 
     @Test
     fun canUpdateAccount() {
-        val account = Account("1234", "Main", "Bankster", 3000)
+        val account = Account("1234", "Main", "Bankster", Capital(3000))
         given(accountRepository.findById("1234")).willReturn(Mono.just(account))
         given(accountRepository.save(account)).willReturn(Mono.just(account))
 
@@ -84,7 +85,7 @@ class AccountTests {
 
     @Test
     fun cannotUpdateAccount_whenUrlIdDoesNotMatchBodyId() {
-        val account = Account("1234", "Main", "Bankster", 3000)
+        val account = Account("1234", "Main", "Bankster", Capital(3000))
         given(accountRepository.findById("123")).willReturn(Mono.just(account))
 
         client.put()

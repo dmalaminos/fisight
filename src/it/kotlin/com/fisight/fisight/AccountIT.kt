@@ -1,6 +1,7 @@
 package com.fisight.fisight;
 
 import com.fisight.fisight.account.Account
+import com.fisight.fisight.capital.Capital
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,8 +34,8 @@ class AccountIT {
         checkExpectedAccounts(emptyArray())
 
         val accounts = arrayOf(
-                Account("1", "Main", "Bankster", 3000),
-                Account("2", "Savings", "Altbank", 7000))
+                Account("1", "Main", "Bankster", Capital(3000)),
+                Account("2", "Savings", "Altbank", Capital(7000)))
         accounts.forEach { mongoTemplate.save(it) }
 
         checkExpectedAccounts(accounts)
@@ -42,10 +43,10 @@ class AccountIT {
 
     @Test
     fun cannotCreateAccount_whenIdAlreadyExists() {
-        val firstAccount = Account("1", "Main", "Bankster", 3000)
+        val firstAccount = Account("1", "Main", "Bankster", Capital(3000))
         mongoTemplate.save(firstAccount)
 
-        val sameIdAccount = Account("1", "Savings", "Altbank", 7000)
+        val sameIdAccount = Account("1", "Savings", "Altbank", Capital(7000))
         client.post()
                 .uri("/accounts")
                 .body(BodyInserters.fromObject(sameIdAccount))
@@ -56,7 +57,7 @@ class AccountIT {
 
     @Test
     fun canDeleteAccounts() {
-        val accountToDelete = Account("1", "Main", "Bankster", 3000)
+        val accountToDelete = Account("1", "Main", "Bankster", Capital(3000))
         mongoTemplate.save(accountToDelete)
 
         client.delete()
