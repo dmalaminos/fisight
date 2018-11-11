@@ -1,6 +1,5 @@
-package com.fisight.fisight
+package com.fisight.fisight.account
 
-import com.fisight.fisight.account.AccountHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
