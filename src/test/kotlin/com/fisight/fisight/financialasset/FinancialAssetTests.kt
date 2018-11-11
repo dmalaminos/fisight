@@ -1,5 +1,6 @@
 package com.fisight.fisight.financialasset
 
+import com.fisight.fisight.capital.Capital
 import com.mongodb.MongoWriteException
 import org.hamcrest.Matchers
 import org.junit.Test
@@ -31,8 +32,8 @@ class FinancialAssetTests {
     @Test
     fun canGetFinancialAssets() {
         val assets = arrayOf(
-                FinancialAsset("1", "My stocks"),
-                FinancialAsset("2", "Shady asset"))
+                FinancialAsset("1", "My stocks", Capital(160)),
+                FinancialAsset("2", "Shady asset", Capital(160)))
         given(financialAssetRepository.findAll()).willReturn(Flux.just(*assets))
 
         client.get()
@@ -47,7 +48,7 @@ class FinancialAssetTests {
 
     @Test
     fun canCreateFinancialAsset() {
-        val asset = FinancialAsset("1", "My stocks")
+        val asset = FinancialAsset("1", "My stocks", Capital(160))
         given(financialAssetRepository.insert(ArgumentMatchers.any<FinancialAsset>())).willReturn(Mono.just(asset))
 
         client.post()
@@ -64,14 +65,14 @@ class FinancialAssetTests {
 
         client.post()
                 .uri("/assets")
-                .body(BodyInserters.fromObject(FinancialAsset("1", "My stocks")))
+                .body(BodyInserters.fromObject(FinancialAsset("1", "My stocks", Capital(160))))
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.CONFLICT)
     }
 
     @Test
     fun canUpdateFinancialAsset() {
-        val asset = FinancialAsset("1", "My stocks")
+        val asset = FinancialAsset("1", "My stocks", Capital(160))
         given(financialAssetRepository.findById("1")).willReturn(Mono.just(asset))
         given(financialAssetRepository.save(asset)).willReturn(Mono.just(asset))
 
@@ -84,7 +85,7 @@ class FinancialAssetTests {
 
     @Test
     fun cannotUpdateFinancialAsset_whenUrlIdDoesNotMatchBodyId() {
-        val asset = FinancialAsset("1", "My stocks")
+        val asset = FinancialAsset("1", "My stocks", Capital(160))
         given(financialAssetRepository.findById("1")).willReturn(Mono.just(asset))
 
         client.put()
