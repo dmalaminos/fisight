@@ -14,7 +14,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 
-//@RunWith(SpringRunner::class)
 @SpringBootTest
 @AutoConfigureWebTestClient
 class AccountIT {
@@ -68,6 +67,40 @@ class AccountIT {
                 .expectStatus().isEqualTo(HttpStatus.CONFLICT)
 
         checkExpectedAccounts(arrayOf(firstAccount))
+    }
+
+    @Test
+    fun canDeleteAccounts() {
+        val firstAccount = Account("1", "Main", "Bankster", 3000)
+
+
+        client.post()
+                .uri("/accounts")
+                .body(BodyInserters.fromObject(firstAccount))
+                .exchange()
+                .expectStatus().isCreated
+                .expectHeader().value("Location", Matchers.`is`("/accounts/1"))
+
+        client.delete()
+                .uri("/accounts/1")
+                .exchange()
+                .expectStatus().isOk
+
+        checkExpectedAccounts(emptyArray())
+
+        client.delete()
+                .uri("/accounts/1")
+                .exchange()
+                .expectStatus().isOk
+
+        checkExpectedAccounts(emptyArray())
+
+        client.delete()
+                .uri("/accounts/1289")
+                .exchange()
+                .expectStatus().isOk
+
+        checkExpectedAccounts(emptyArray())
     }
 
     private fun checkExpectedAccounts(accounts: Array<Account>) {

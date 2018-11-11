@@ -46,7 +46,7 @@ class AccountTests {
     }
 
     @Test
-    fun createAccount() {
+    fun canCreateAccount() {
         val account = Account("1234", "Main", "Bankster", 3000)
         given(accountRepository.insert(ArgumentMatchers.any<Account>())).willReturn(Mono.just(account))
 
@@ -92,5 +92,16 @@ class AccountTests {
                 .body(BodyInserters.fromObject(account))
                 .exchange()
                 .expectStatus().isBadRequest
+    }
+
+    @Test
+    fun canDeleteAccount() {
+        val account = Account("1234", "Main", "Bankster", 3000)
+        given(accountRepository.deleteById("1234")).willReturn(Mono.empty())
+
+        client.delete()
+                .uri("/accounts/1234")
+                .exchange()
+                .expectStatus().isOk
     }
 }

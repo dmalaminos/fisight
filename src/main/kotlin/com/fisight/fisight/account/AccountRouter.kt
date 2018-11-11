@@ -15,6 +15,7 @@ class AccountRouter {
             GET("", handler::getAll)
             POST("", handler::save)
             PUT("/{id}", handler::update)
+            DELETE("/{id}", handler::delete)
         }
         GET("/status") { ServerResponse.ok().contentType(MediaType.TEXT_PLAIN).body(fromObject("Up and running!")) }
     }
