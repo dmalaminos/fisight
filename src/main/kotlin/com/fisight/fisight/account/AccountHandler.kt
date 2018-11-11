@@ -19,7 +19,7 @@ class AccountHandler(private val accountRepository: AccountRepository) {
         //TODO: add host to created location builder
         return newAccount
                 .flatMap { accountRepository.insert(it) }
-                .flatMap { ServerResponse.created(UriComponentsBuilder.fromPath("/accounts/{id}").buildAndExpand(it.id).toUri() ).build() }
+                .flatMap { ServerResponse.created(UriComponentsBuilder.fromPath("/accounts/{id}").buildAndExpand(it.id).toUri()).build() }
                 .onErrorResume { ServerResponse.status(HttpStatus.CONFLICT).build() }
     }
 

@@ -1,7 +1,6 @@
 package com.fisight.fisight;
 
 import com.fisight.fisight.account.Account
-import org.hamcrest.Matchers
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,14 +35,7 @@ class AccountIT {
         val accounts = arrayOf(
                 Account("1", "Main", "Bankster", 3000),
                 Account("2", "Savings", "Altbank", 7000))
-        accounts.forEach {
-            client.post()
-                    .uri("/accounts")
-                    .body(BodyInserters.fromObject(it))
-                    .exchange()
-                    .expectStatus().isCreated
-                    .expectHeader().value("Location", Matchers.`is`("/accounts/${it.id}"))
-        }
+        accounts.forEach { mongoTemplate.save(it) }
 
         checkExpectedAccounts(accounts)
     }
@@ -51,55 +43,38 @@ class AccountIT {
     @Test
     fun cannotCreateAccount_whenIdAlreadyExists() {
         val firstAccount = Account("1", "Main", "Bankster", 3000)
+        mongoTemplate.save(firstAccount)
+
         val sameIdAccount = Account("1", "Savings", "Altbank", 7000)
-
-        client.post()
-                .uri("/accounts")
-                .body(BodyInserters.fromObject(firstAccount))
-                .exchange()
-                .expectStatus().isCreated
-                .expectHeader().value("Location", Matchers.`is`("/accounts/${firstAccount.id}"))
-
         client.post()
                 .uri("/accounts")
                 .body(BodyInserters.fromObject(sameIdAccount))
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.CONFLICT)
-
         checkExpectedAccounts(arrayOf(firstAccount))
     }
 
     @Test
     fun canDeleteAccounts() {
-        val firstAccount = Account("1", "Main", "Bankster", 3000)
-
-
-        client.post()
-                .uri("/accounts")
-                .body(BodyInserters.fromObject(firstAccount))
-                .exchange()
-                .expectStatus().isCreated
-                .expectHeader().value("Location", Matchers.`is`("/accounts/1"))
+        val accountToDelete = Account("1", "Main", "Bankster", 3000)
+        mongoTemplate.save(accountToDelete)
 
         client.delete()
                 .uri("/accounts/1")
                 .exchange()
                 .expectStatus().isOk
-
         checkExpectedAccounts(emptyArray())
 
         client.delete()
                 .uri("/accounts/1")
                 .exchange()
                 .expectStatus().isOk
-
         checkExpectedAccounts(emptyArray())
 
         client.delete()
                 .uri("/accounts/1289")
                 .exchange()
                 .expectStatus().isOk
-
         checkExpectedAccounts(emptyArray())
     }
 
