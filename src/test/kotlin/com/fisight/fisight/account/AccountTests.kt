@@ -96,7 +96,6 @@ class AccountTests {
 
     @Test
     fun canDeleteAccount() {
-        val account = Account("1234", "Main", "Bankster", 3000)
         given(accountRepository.deleteById("1234")).willReturn(Mono.empty())
 
         client.delete()

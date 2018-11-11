@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.server.router
 @Configuration
 class AccountRouter {
     @Bean
-    fun route(handler: AccountHandler) = router {
+    fun accountRoutes(handler: AccountHandler) = router {
         "/accounts".nest {
             GET("", handler::getAll)
             POST("", handler::save)
