@@ -30,7 +30,7 @@ class AccountTests {
     private lateinit var accountRepository: AccountRepository
 
     @Test
-    fun canGetExistingAccounts() {
+    fun canGetAccounts() {
         val accounts = arrayOf(
                 Account("1", "Main", "Bankster", Capital(3000)),
                 Account("2", "Savings", "Altbank", Capital(7000)))
@@ -44,6 +44,32 @@ class AccountTests {
                 .expectBodyList(Account::class.java)
                 .hasSize(2)
                 .contains(*accounts)
+    }
+
+    @Test
+    fun canGetAccountById() {
+        val account = Account("123", "Main", "Bankster", Capital(3000))
+
+        given(accountRepository.findById("123")).willReturn(Mono.just(account))
+
+        client.get()
+                .uri("/accounts/123")
+                .exchange()
+                .expectStatus().isOk
+                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .expectBodyList(Account::class.java)
+                .hasSize(1)
+                .contains(account)
+    }
+
+    @Test
+    fun cannotGetAccountById_whenIdDoesNotExist() {
+        given(accountRepository.findById("123")).willReturn(Mono.empty())
+
+        client.get()
+                .uri("/accounts/123")
+                .exchange()
+                .expectStatus().isBadRequest
     }
 
     @Test

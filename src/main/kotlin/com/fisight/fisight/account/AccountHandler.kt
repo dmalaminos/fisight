@@ -2,6 +2,7 @@ package com.fisight.fisight.account
 
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
+import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.body
@@ -12,6 +13,13 @@ import reactor.core.publisher.Mono
 class AccountHandler(private val accountRepository: AccountRepository) {
     fun getAll(request: ServerRequest) =
             ServerResponse.ok().body(accountRepository.findAll())
+
+    fun getById(request: ServerRequest): Mono<ServerResponse> {
+        val requestedId = request.pathVariable("id")
+        return accountRepository.findById(requestedId)
+                .flatMap { ServerResponse.ok().body(BodyInserters.fromObject(it)) }
+                .switchIfEmpty(ServerResponse.badRequest().build())
+    }
 
     fun save(request: ServerRequest): Mono<ServerResponse> {
         val newAccount = request.bodyToMono(Account::class.java)

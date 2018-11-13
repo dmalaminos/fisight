@@ -10,6 +10,7 @@ class FinancialAssetRouter {
     fun financialAssetRoutes(handler: FinancialAssetHandler) = router {
         "/assets".nest {
             GET("", handler::getAll)
+            GET("/{id}", handler::getById)
             POST("", handler::save)
             PUT("/{id}", handler::update)
             DELETE("/{id}", handler::delete)

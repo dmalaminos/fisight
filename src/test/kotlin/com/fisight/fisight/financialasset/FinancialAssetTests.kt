@@ -47,6 +47,31 @@ class FinancialAssetTests {
     }
 
     @Test
+    fun canGetFinancialAssetById() {
+        val asset = FinancialAsset("123", "My stocks", Capital(160))
+        given(financialAssetRepository.findById("123")).willReturn(Mono.just(asset))
+
+        client.get()
+                .uri("/assets/123")
+                .exchange()
+                .expectStatus().isOk
+                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+                .expectBodyList(FinancialAsset::class.java)
+                .hasSize(1)
+                .contains(asset)
+    }
+
+    @Test
+    fun cannotGetFinancialAssetById_whenIdDoesNotExist() {
+        given(financialAssetRepository.findById("123")).willReturn(Mono.empty())
+
+        client.get()
+                .uri("/assets/123")
+                .exchange()
+                .expectStatus().isBadRequest
+    }
+
+    @Test
     fun canCreateFinancialAsset() {
         val asset = FinancialAsset("1", "My stocks", Capital(160))
         given(financialAssetRepository.insert(ArgumentMatchers.any<FinancialAsset>())).willReturn(Mono.just(asset))

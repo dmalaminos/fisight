@@ -13,6 +13,7 @@ class AccountRouter {
     fun accountRoutes(handler: AccountHandler) = router {
         "/accounts".nest {
             GET("", handler::getAll)
+            GET("/{id}", handler::getById)
             POST("", handler::save)
             PUT("/{id}", handler::update)
             DELETE("/{id}", handler::delete)
