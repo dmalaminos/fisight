@@ -42,20 +42,6 @@ class AccountIT {
     }
 
     @Test
-    fun cannotCreateAccount_whenIdAlreadyExists() {
-        val firstAccount = Account("1", "Main", "Bankster", Capital(3000))
-        mongoTemplate.save(firstAccount)
-
-        val sameIdAccount = Account("1", "Savings", "Altbank", Capital(7000))
-        client.post()
-                .uri("/accounts")
-                .body(BodyInserters.fromObject(sameIdAccount))
-                .exchange()
-                .expectStatus().isEqualTo(HttpStatus.CONFLICT)
-        checkExpectedAccounts(arrayOf(firstAccount))
-    }
-
-    @Test
     fun canDeleteAccounts() {
         val accountToDelete = Account("1", "Main", "Bankster", Capital(3000))
         mongoTemplate.save(accountToDelete)
