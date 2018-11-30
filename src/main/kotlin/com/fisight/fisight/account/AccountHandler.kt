@@ -28,8 +28,8 @@ class AccountHandler(private val accountRepository: AccountRepository, private v
         val newAccount = request .bodyToMono(Account::class.java)
         //TODO: input validation
         //TODO: add host to created location builder
-        return newAccount.flatMap { commandGateway.send<String>(CreateAccountCommand(it.id, it.name, it.bankName)).toMono() }
-                .flatMap { ServerResponse.created(UriComponentsBuilder.fromPath("/accounts/{id}").buildAndExpand(it).toUri()).build() }
+        return newAccount.flatMap { commandGateway.send<AccountId>(CreateAccountCommand(AccountId(), it.name, it.bankName)).toMono() }
+                .flatMap { ServerResponse.created(UriComponentsBuilder.fromPath("/accounts/{id}").buildAndExpand(it.identifier).toUri()).build() }
                 .onErrorResume { ServerResponse.status(HttpStatus.CONFLICT).build() }
     }
 

@@ -75,25 +75,13 @@ class AccountTests {
     @Test
     fun canCreateAccount() {
         val account = Account("1234", "Main", "Bankster", Capital(3000))
-        given(accountRepository.insert(ArgumentMatchers.any<Account>())).willReturn(Mono.just(account))
 
         client.post()
                 .uri("/accounts")
                 .body(BodyInserters.fromObject(account))
                 .exchange()
                 .expectStatus().isCreated
-                .expectHeader().value("Location", Matchers.`is`("/accounts/1234"))
-    }
-
-    @Test
-    fun cannotCreateAccount_whenIdAlreadyExists() {
-        given(accountRepository.insert(ArgumentMatchers.any<Mono<Account>>())).willThrow(MongoWriteException::class.java)
-
-        client.post()
-                .uri("/accounts")
-                .body(BodyInserters.fromObject(Account("1234", "Main", "Bankster", Capital(3000))))
-                .exchange()
-                .expectStatus().isEqualTo(HttpStatus.CONFLICT)
+                .expectHeader().value("Location", Matchers.startsWith("/accounts/"))
     }
 
     @Test

@@ -7,13 +7,13 @@ import org.axonframework.commandhandling.model.AggregateLifecycle
 import org.axonframework.eventsourcing.EventSourcingHandler
 import org.axonframework.spring.stereotype.Aggregate
 
-data class CreateAccountCommand(@TargetAggregateIdentifier val accountId: String, val name: String, val bankName: String)
-data class AccountCreatedEvent(val accountId: String, val name: String, val bankName: String)
+data class CreateAccountCommand(@TargetAggregateIdentifier val accountId: AccountId, val name: String, val bankName: String)
+data class AccountCreatedEvent(val accountId: AccountId, val name: String, val bankName: String)
 
 @Aggregate
 class AccountAggregate  {
     @AggregateIdentifier
-    private lateinit var id: String
+    private lateinit var id: AccountId
     private lateinit var name: String
     private lateinit var bankName: String
     private var capital: Double? = 0.0
