@@ -1,5 +1,7 @@
 package com.fisight.fisight.financialasset
 
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository
+import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.stereotype.Repository
 
-interface FinancialAssetRepository : ReactiveMongoRepository<FinancialAsset, String>
+@Repository("financialAssetQueryRepository")
+interface FinancialAssetRepository : MongoRepository<FinancialAsset, String>

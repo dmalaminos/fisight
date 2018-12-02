@@ -15,10 +15,8 @@ class AxonConfig {
     fun eventStorageEngine(client: MongoClient) = MongoEventStorageEngine(DefaultMongoTemplate(client))
 
     @Bean
-    fun snapshotterFactory() =
-            SpringAggregateSnapshotterFactoryBean()
+    fun snapshotterFactory() = SpringAggregateSnapshotterFactoryBean()
 
     @Bean
-    fun eventCountSnapshot(snapshotter: Snapshotter) =
-            EventCountSnapshotTriggerDefinition(snapshotter, 50)
+    fun eventCountSnapshot(snapshotter: Snapshotter) = EventCountSnapshotTriggerDefinition(snapshotter, 50)
 }

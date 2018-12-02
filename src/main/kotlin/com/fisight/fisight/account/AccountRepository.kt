@@ -1,5 +1,7 @@
 package com.fisight.fisight.account
 
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository
+import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.stereotype.Repository
 
-interface AccountRepository : ReactiveMongoRepository<Account, String>
+@Repository("accountQueryRepository")
+interface AccountRepository : MongoRepository<Account, String>

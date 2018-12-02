@@ -1,132 +1,106 @@
 package com.fisight.fisight.financialasset
 
 import com.fisight.fisight.capital.Capital
-import com.mongodb.MongoWriteException
-import org.hamcrest.Matchers
+import org.axonframework.commandhandling.gateway.CommandGateway
+import org.axonframework.queryhandling.QueryGateway
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.test.context.junit4.SpringRunner
-import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.web.reactive.function.BodyInserters
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import java.util.*
 
 @RunWith(SpringRunner::class)
-@SpringBootTest
-@AutoConfigureWebTestClient
+@WebMvcTest(FinancialAssetController::class)
 class FinancialAssetTests {
     @Autowired
-    private lateinit var client: WebTestClient
+    private lateinit var client: MockMvc
 
     @MockBean
     private lateinit var financialAssetRepository: FinancialAssetRepository
 
+    @MockBean
+    private lateinit var queryGateway: QueryGateway
+
+    @MockBean
+    private lateinit var commandGateway: CommandGateway
+
     @Test
     fun canGetFinancialAssets() {
         val assets = arrayOf(
-                FinancialAsset("1", "My stocks", Capital(160)),
-                FinancialAsset("2", "Shady asset", Capital(160)))
-        given(financialAssetRepository.findAll()).willReturn(Flux.just(*assets))
+                FinancialAsset("1", "My stocks", Capital(160.0)),
+                FinancialAsset("2", "Shady asset", Capital(160.0)))
+        given(financialAssetRepository.findAll()).willReturn(assets.toList())
 
-        client.get()
-                .uri("/assets")
-                .exchange()
-                .expectStatus().isOk
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
-                .expectBodyList(FinancialAsset::class.java)
-                .hasSize(2)
-                .contains(*assets)
+        client.perform(MockMvcRequestBuilders.get("/assets/"))
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("My stocks"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].capital.amount").value("160.0"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].name").value("Shady asset"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].capital.amount").value("160.0"))
     }
 
     @Test
     fun canGetFinancialAssetById() {
-        val asset = FinancialAsset("123", "My stocks", Capital(160))
-        given(financialAssetRepository.findById("123")).willReturn(Mono.just(asset))
+        val asset = FinancialAsset("123", "My stocks", Capital(160.0))
+        given(financialAssetRepository.findById("123")).willReturn(Optional.of(asset))
 
-        client.get()
-                .uri("/assets/123")
-                .exchange()
-                .expectStatus().isOk
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
-                .expectBodyList(FinancialAsset::class.java)
-                .hasSize(1)
-                .contains(asset)
+        client.perform(MockMvcRequestBuilders.get("/assets/123"))
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("My stocks"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.capital.amount").value("160.0"))
     }
 
     @Test
     fun cannotGetFinancialAssetById_whenIdDoesNotExist() {
-        given(financialAssetRepository.findById("123")).willReturn(Mono.empty())
+        given(financialAssetRepository.findById("123")).willReturn(Optional.empty())
 
-        client.get()
-                .uri("/assets/123")
-                .exchange()
-                .expectStatus().isBadRequest
+        client.perform(MockMvcRequestBuilders.get("/assets/123"))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
     @Test
     fun canCreateFinancialAsset() {
-        val asset = FinancialAsset("1", "My stocks", Capital(160))
-        given(financialAssetRepository.insert(ArgumentMatchers.any<FinancialAsset>())).willReturn(Mono.just(asset))
-
-        client.post()
-                .uri("/assets")
-                .body(BodyInserters.fromObject(asset))
-                .exchange()
-                .expectStatus().isCreated
-                .expectHeader().value("Location", Matchers.`is`("/assets/1"))
-    }
-
-    @Test
-    fun cannotCreateFinancialAsset_whenIdAlreadyExists() {
-        given(financialAssetRepository.insert(ArgumentMatchers.any<Mono<FinancialAsset>>())).willThrow(MongoWriteException::class.java)
-
-        client.post()
-                .uri("/assets")
-                .body(BodyInserters.fromObject(FinancialAsset("1", "My stocks", Capital(160))))
-                .exchange()
-                .expectStatus().isEqualTo(HttpStatus.CONFLICT)
+        client.perform(MockMvcRequestBuilders.post("/assets/")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("""{"id": "123", "name": "My stocks", "capital": {"amount": 3000.0}}"""))
+                .andExpect(MockMvcResultMatchers.status().isCreated)
+                .andExpect(MockMvcResultMatchers.header().string("Location", "/assets/123"))
     }
 
     @Test
     fun canUpdateFinancialAsset() {
-        val asset = FinancialAsset("1", "My stocks", Capital(160))
-        given(financialAssetRepository.findById("1")).willReturn(Mono.just(asset))
-        given(financialAssetRepository.save(asset)).willReturn(Mono.just(asset))
+        val asset = FinancialAsset("123", "My stocks", Capital(160.0))
+        given(financialAssetRepository.findById("123")).willReturn(Optional.of(asset))
 
-        client.put()
-                .uri("/assets/1")
-                .body(BodyInserters.fromObject(asset))
-                .exchange()
-                .expectStatus().isOk
+        client.perform(MockMvcRequestBuilders.put("/assets/123")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("""{"id": "123", "name": "B-stocks", "capital": {"amount": 3000.0}}"""))
+                .andExpect(MockMvcResultMatchers.status().isOk)
     }
 
     @Test
     fun cannotUpdateFinancialAsset_whenUrlIdDoesNotMatchBodyId() {
-        val asset = FinancialAsset("1", "My stocks", Capital(160))
-        given(financialAssetRepository.findById("1")).willReturn(Mono.just(asset))
+        val asset = FinancialAsset("123", "My stocks", Capital(160.0))
+        given(financialAssetRepository.findById("123")).willReturn(Optional.of(asset))
 
-        client.put()
-                .uri("/assets/23")
-                .body(BodyInserters.fromObject(asset))
-                .exchange()
-                .expectStatus().isBadRequest
+        client.perform(MockMvcRequestBuilders.put("/assets/123")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("""{"id": "234", "name": "B-stocks", "capital": {"amount": 3000.0}}"""))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
     @Test
     fun canDeleteFinancialAsset() {
-        given(financialAssetRepository.deleteById("1")).willReturn(Mono.empty())
-
-        client.delete()
-                .uri("/assets/1")
-                .exchange()
-                .expectStatus().isOk
+        client.perform(MockMvcRequestBuilders.delete("/assets/1234"))
+                .andExpect(MockMvcResultMatchers.status().isOk)
     }
 }

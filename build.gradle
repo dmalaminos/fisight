@@ -39,18 +39,16 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	implementation('org.springframework.boot:spring-boot-starter-webflux')
-	implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+	implementation('org.springframework.boot:spring-boot-starter-web')
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+	implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
     implementation("org.axonframework:axon-spring-boot-starter:3.4.1")
     implementation("org.axonframework:axon-mongo:3.4.1")
 	runtimeOnly('org.springframework.boot:spring-boot-devtools')
-	testImplementation("org.axonframework:axon-test:3.4.1")
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
-	testImplementation('io.projectreactor:reactor-test')
-    testImplementation('org.junit.jupiter:junit-jupiter-api')
-    testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
+	testImplementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
+	testImplementation('org.junit.jupiter:junit-jupiter-api')
+	testImplementation("org.axonframework:axon-test:3.4.1")
 }

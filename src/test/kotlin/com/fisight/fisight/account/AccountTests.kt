@@ -1,121 +1,118 @@
 package com.fisight.fisight.account
 
 import com.fisight.fisight.capital.Capital
-import com.mongodb.MongoWriteException
+import org.axonframework.commandhandling.gateway.CommandGateway
+import org.axonframework.queryhandling.QueryGateway
 import org.hamcrest.Matchers
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.MediaType.APPLICATION_JSON_UTF8
 import org.springframework.test.context.junit4.SpringRunner
-import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.web.reactive.function.BodyInserters
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.util.*
 
 @RunWith(SpringRunner::class)
-@SpringBootTest
-@AutoConfigureWebTestClient
+@WebMvcTest(AccountController::class)
 class AccountTests {
     @Autowired
-    private lateinit var client: WebTestClient
+    private lateinit var client: MockMvc
 
     @MockBean
     private lateinit var accountRepository: AccountRepository
 
+    @MockBean
+    private lateinit var queryGateway: QueryGateway
+
+    @MockBean
+    private lateinit var commandGateway: CommandGateway
+
     @Test
     fun canGetAccounts() {
         val accounts = arrayOf(
-                Account("1", "Main", "Bankster", Capital(3000)),
-                Account("2", "Savings", "Altbank", Capital(7000)))
-        given(accountRepository.findAll()).willReturn(Flux.just(*accounts))
+                Account(AccountId("1"), "Main", "Bankster", Capital(3000.0)),
+                Account(AccountId("2"), "Savings", "Altbank", Capital(7000.0)))
+        given(accountRepository.findAll()).willReturn(accounts.toList())
 
-        client.get()
-                .uri("/accounts")
-                .exchange()
-                .expectStatus().isOk
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
-                .expectBodyList(Account::class.java)
-                .hasSize(2)
-                .contains(*accounts)
+        client.perform(get("/accounts/"))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$[0].name").value("Main"))
+                .andExpect(jsonPath("$[0].bankName").value("Bankster"))
+                .andExpect(jsonPath("$[0].capital.amount").value("3000.0"))
+                .andExpect(jsonPath("$[1].name").value("Savings"))
+                .andExpect(jsonPath("$[1].bankName").value("Altbank"))
+                .andExpect(jsonPath("$[1].capital.amount").value("7000.0"))
     }
 
     @Test
     fun canGetAccountById() {
-        val account = Account("123", "Main", "Bankster", Capital(3000))
+        val account = Account(AccountId("123"), "Main", "Bankster", Capital(3000.0))
+        given(accountRepository.findById("123")).willReturn(Optional.of(account))
 
-        given(accountRepository.findById("123")).willReturn(Mono.just(account))
-
-        client.get()
-                .uri("/accounts/123")
-                .exchange()
-                .expectStatus().isOk
-                .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
-                .expectBodyList(Account::class.java)
-                .hasSize(1)
-                .contains(account)
+        client.perform(get("/accounts/123"))
+                .andExpect(status().isOk)
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(jsonPath("$.name").value("Main"))
+                .andExpect(jsonPath("$.bankName").value("Bankster"))
+                .andExpect(jsonPath("$.capital.amount").value("3000.0"))
     }
 
     @Test
     fun cannotGetAccountById_whenIdDoesNotExist() {
-        given(accountRepository.findById("123")).willReturn(Mono.empty())
+        given(accountRepository.findById("123")).willReturn(Optional.empty())
 
-        client.get()
-                .uri("/accounts/123")
-                .exchange()
-                .expectStatus().isBadRequest
+        client.perform(get("/accounts/123"))
+                .andExpect(status().isBadRequest)
     }
 
     @Test
     fun canCreateAccount() {
-        val account = Account("1234", "Main", "Bankster", Capital(3000))
-
-        client.post()
-                .uri("/accounts")
-                .body(BodyInserters.fromObject(account))
-                .exchange()
-                .expectStatus().isCreated
-                .expectHeader().value("Location", Matchers.startsWith("/accounts/"))
+        client.perform(post("/accounts/")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content("""{"id":{"identifier": "123"}, "name": "Main", "bankName":"Bankster", "capital": {"amount": 3000.0}}"""))
+                .andExpect(status().isCreated)
+                .andExpect(header().string("Location", Matchers.startsWith("/accounts/")))
     }
 
     @Test
     fun canUpdateAccount() {
-        val account = Account("1234", "Main", "Bankster", Capital(3000))
-        given(accountRepository.findById("1234")).willReturn(Mono.just(account))
-        given(accountRepository.save(account)).willReturn(Mono.just(account))
+        val account = Account(AccountId("123"), "Main", "Bankster", Capital(3000.0))
+        given(accountRepository.findById("123")).willReturn(Optional.of(account))
+        given(accountRepository.save(account)).willReturn(account)
 
-        client.put()
-                .uri("/accounts/1234")
-                .body(BodyInserters.fromObject(account))
-                .exchange()
-                .expectStatus().isOk
+        client.perform(put("/accounts/123")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content("""{"id":{"identifier": "123"}, "name": "Secondary", "bankName":"Bankster", "capital": {"amount": 3000.0}}"""))
+                .andExpect(status().isOk)
     }
 
     @Test
     fun cannotUpdateAccount_whenUrlIdDoesNotMatchBodyId() {
-        val account = Account("1234", "Main", "Bankster", Capital(3000))
-        given(accountRepository.findById("123")).willReturn(Mono.just(account))
+        val account = Account(AccountId("123"), "Main", "Bankster", Capital(3000.0))
+        given(accountRepository.findById("123")).willReturn(Optional.of(account))
 
-        client.put()
-                .uri("/accounts/123")
-                .body(BodyInserters.fromObject(account))
-                .exchange()
-                .expectStatus().isBadRequest
+        client.perform(put("/accounts/123")
+                .contentType(APPLICATION_JSON_UTF8)
+                .content("""{"id":{"identifier": "234"}, "name": "Secondary", "bankName":"Bankster", "capital": {"amount": 3000.0}}"""))
+                .andExpect(status().isBadRequest)
     }
 
     @Test
     fun canDeleteAccount() {
-        given(accountRepository.deleteById("1234")).willReturn(Mono.empty())
-
-        client.delete()
-                .uri("/accounts/1234")
-                .exchange()
-                .expectStatus().isOk
+        client.perform(delete("/accounts/1234"))
+                .andExpect(status().isOk)
     }
 }
