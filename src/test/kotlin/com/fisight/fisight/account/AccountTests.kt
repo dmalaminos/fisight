@@ -2,11 +2,17 @@ package com.fisight.fisight.account
 
 import com.fisight.fisight.capital.Capital
 import org.axonframework.commandhandling.gateway.CommandGateway
+import org.axonframework.common.IdentifierFactory
 import org.axonframework.queryhandling.QueryGateway
 import org.hamcrest.Matchers
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
+import org.mockito.BDDMockito.any
 import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.verify
+import org.mockito.Mockito
+import org.mockito.Mockito.times
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -38,6 +44,9 @@ class AccountTests {
 
     @MockBean
     private lateinit var commandGateway: CommandGateway
+
+    @MockBean
+    private lateinit var identifierFactory: IdentifierFactory
 
     @Test
     fun canGetAccounts() {
@@ -80,11 +89,15 @@ class AccountTests {
 
     @Test
     fun canCreateAccount() {
+        given(commandGateway.sendAndWait<AccountId>(ArgumentMatchers.any(CreateAccountCommand::class.java))).willReturn(AccountId("123"))
         client.perform(post("/accounts/")
                 .contentType(APPLICATION_JSON_UTF8)
-                .content("""{"id":{"identifier": "123"}, "name": "Main", "bankName":"Bankster", "capital": {"amount": 3000.0}}"""))
+                .content("""{"name": "Main", "bankName":"Bankster", "capital": {"amount": 3000.0}}"""))
                 .andExpect(status().isCreated)
-                .andExpect(header().string("Location", Matchers.startsWith("/accounts/")))
+                .andExpect(header().string("Location", "/accounts/123"))
+//        TODO: workaround AccountId mocking
+//        Mockito.verify(commandGateway, times(1))
+//                .sendAndWait<AccountId>(CreateAccountCommand(AccountId(), "Main", "Bankster", Capital(3000.0)))
     }
 
     @Test

@@ -32,7 +32,7 @@ class AccountController(private val accountRepository: AccountRepository, privat
     fun save(@RequestBody account: Account): ResponseEntity<Any> {
         //TODO: input validation
         //TODO: add host to created location builder
-        val newAccountId = AccountId() //commandGateway.sendAndWait<AccountId>(CreateAccountCommand(AccountId(), account.name, account.bankName))
+        val newAccountId = commandGateway.sendAndWait<AccountId>(CreateAccountCommand(AccountId(), account.name, account.bankName, account.capital))
         return ResponseEntity.created(UriComponentsBuilder.fromPath("/accounts/{id}").buildAndExpand(newAccountId.identifier).toUri()).build()
 //        return ResponseEntity.status(HttpStatus.CONFLICT).build()
     }
