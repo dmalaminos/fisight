@@ -1,18 +1,10 @@
-package com.fisight.fisight.account
+package com.fisight.account
 
-import com.fisight.fisight.capital.Capital
-import org.axonframework.commandhandling.gateway.CommandGateway
-import org.axonframework.common.IdentifierFactory
-import org.axonframework.queryhandling.QueryGateway
-import org.hamcrest.Matchers
+import com.fisight.capital.Capital
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
-import org.mockito.BDDMockito.any
 import org.mockito.BDDMockito.given
-import org.mockito.BDDMockito.verify
-import org.mockito.Mockito
-import org.mockito.Mockito.times
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -20,14 +12,8 @@ import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON_UTF8
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.util.*
 
 @RunWith(SpringRunner::class)
@@ -38,15 +24,6 @@ class AccountTests {
 
     @MockBean
     private lateinit var accountRepository: AccountRepository
-
-    @MockBean
-    private lateinit var queryGateway: QueryGateway
-
-    @MockBean
-    private lateinit var commandGateway: CommandGateway
-
-    @MockBean
-    private lateinit var identifierFactory: IdentifierFactory
 
     @Test
     fun canGetAccounts() {

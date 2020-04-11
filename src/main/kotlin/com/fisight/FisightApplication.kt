@@ -1,4 +1,4 @@
-package com.fisight.fisight
+package com.fisight
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
