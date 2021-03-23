@@ -4,4 +4,4 @@ import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface AccountRepository : CrudRepository<Account, AccountId>
+interface AccountRepository : CrudRepository<Account, Int>

@@ -13,23 +13,25 @@ class AccountController(private val accountRepository: AccountRepository) {
     }
 
     @GetMapping("/{id}")
-    fun getById(@PathVariable("id") id: String): ResponseEntity<Account> {
-        val account = accountRepository.findById(AccountId(id))
+    fun getById(@PathVariable("id") id: Int): ResponseEntity<Account> {
+        val account = accountRepository.findById(id)
         return account.map { ResponseEntity.ok(it) }
-                .orElse(ResponseEntity.badRequest().build())
+            .orElse(ResponseEntity.badRequest().build())
     }
 
     @PostMapping("/")
     fun save(@RequestBody account: Account): ResponseEntity<Any> {
         //TODO: input validation
-        val accountToSave = Account(AccountId(), account.name, account.bankName, account.capital)
+        val accountToSave = Account(account.id, account.name, account.bankName, account.capital)
         accountRepository.save(accountToSave)
-        return ResponseEntity.created(UriComponentsBuilder.fromPath("/accounts/{id}").buildAndExpand(accountToSave.id).toUri()).build()
+        return ResponseEntity.created(
+            UriComponentsBuilder.fromPath("/accounts/{id}").buildAndExpand(accountToSave.id).toUri()
+        ).build()
     }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable("id") id: String, @RequestBody account: Account): ResponseEntity<Any> {
-        if (account.id == AccountId(id)) {
+    fun update(@PathVariable("id") id: Int, @RequestBody account: Account): ResponseEntity<Any> {
+        if (account.id == id) {
             accountRepository.save(account)
             return ResponseEntity.ok().build()
         }
@@ -37,8 +39,8 @@ class AccountController(private val accountRepository: AccountRepository) {
     }
 
     @DeleteMapping("/{id}")
-    fun delete(@PathVariable("id") id: String): ResponseEntity<Any> {
-        accountRepository.deleteById(AccountId(id))
+    fun delete(@PathVariable("id") id: Int): ResponseEntity<Any> {
+        accountRepository.deleteById(id)
         return ResponseEntity.ok().build()
     }
 }

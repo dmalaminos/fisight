@@ -3,14 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 group = "com.fisight"
 version = "0.0.2"
 
-
 plugins {
-	kotlin("jvm") version "1.3.71"
-	kotlin("plugin.spring") version "1.3.71"
-	kotlin("plugin.jpa") version "1.3.71"
-	kotlin("plugin.allopen") version "1.3.71"
-	id("org.springframework.boot") version "2.2.6.RELEASE"
-	id("io.spring.dependency-management") version "1.0.9.RELEASE"
+	kotlin("jvm") version "1.4.31"
+	kotlin("plugin.spring") version "1.4.31"
+	kotlin("plugin.jpa") version "1.4.31"
+	id("org.springframework.boot") version "2.4.4"
+	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 }
 
 repositories {
@@ -18,22 +16,15 @@ repositories {
 }
 
 dependencies {
+	implementation(kotlin("reflect"))
 	implementation(kotlin("stdlib-jdk8"))
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("org.postgresql:postgresql")
-	runtimeOnly("org.springframework.boot:spring-boot-devtools")
-	runtimeOnly("com.h2database:h2")
-	testImplementation(kotlin("test"))
-	testImplementation(kotlin("test-junit"))
+	implementation("org.flywaydb:flyway-core")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-allOpen {
-	annotation("javax.persistence.Entity")
-	annotation("javax.persistence.Embeddable")
-	annotation("javax.persistence.MappedSuperclass")
+	runtimeOnly("com.h2database:h2")
+	runtimeOnly("org.postgresql:postgresql")
 }
 
 tasks.withType<KotlinCompile> {
@@ -41,4 +32,8 @@ tasks.withType<KotlinCompile> {
 		freeCompilerArgs = listOf("-Xjsr305=strict")
 		jvmTarget = "1.8"
 	}
+}
+
+tasks.withType<Test> {
+	useJUnitPlatform()
 }
