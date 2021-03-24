@@ -20,7 +20,7 @@ class FinancialLocationTests {
     private lateinit var financialLocationRepository: FinancialLocationRepository
 
     @Test
-    fun shouldGetAllAccounts() {
+    fun `gets all accounts`() {
         val accounts = arrayOf(
             FinancialLocation(1, "Main", "Bankster"),
             FinancialLocation(2, "Savings", "Altbank")
@@ -37,7 +37,7 @@ class FinancialLocationTests {
     }
 
     @Test
-    fun shouldGetAccountById() {
+    fun `gets an account by id`() {
         val account = FinancialLocation(123, "Main", "Bankster")
         given(financialLocationRepository.findById(123)).willReturn(Optional.of(account))
 
@@ -49,7 +49,7 @@ class FinancialLocationTests {
     }
 
     @Test
-    fun shouldNotGetAccountById_whenIdDoesNotExist() {
+    fun `cannot get an account by id when id does not exist`() {
         given(financialLocationRepository.findById(123)).willReturn(Optional.empty())
 
         client.perform(get("/financial-locations/123"))
@@ -57,7 +57,7 @@ class FinancialLocationTests {
     }
 
     @Test
-    fun shouldCreateAccount() {
+    fun `creates an account`() {
         client.perform(
             post("/financial-locations/")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -68,7 +68,7 @@ class FinancialLocationTests {
     }
 
     @Test
-    fun shouldUpdateAccount() {
+    fun `updates an account`() {
         val account = FinancialLocation(123, "Main", "Bankster")
         given(financialLocationRepository.findById(123)).willReturn(Optional.of(account))
         given(financialLocationRepository.save(account)).willReturn(account)
@@ -82,7 +82,7 @@ class FinancialLocationTests {
     }
 
     @Test
-    fun shouldNotUpdateAccount_whenUrlIdDoesNotMatchBodyId() {
+    fun `does not update an account when URL id does not match body id`() {
         val account = FinancialLocation(123, "Main", "Bankster")
         given(financialLocationRepository.findById(123)).willReturn(Optional.of(account))
 
@@ -95,7 +95,7 @@ class FinancialLocationTests {
     }
 
     @Test
-    fun shouldDeleteAccount() {
+    fun `deletes an account`() {
         client.perform(delete("/financial-locations/1234"))
             .andExpect(status().isOk)
     }
