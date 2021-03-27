@@ -1,4 +1,4 @@
-package com.fisight.account
+package com.fisight.financialLocation
 
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository

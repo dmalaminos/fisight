@@ -1,5 +1,6 @@
-package com.fisight.account
+package com.fisight.financialLocation
 
+import java.util.*
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
@@ -7,12 +8,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import java.util.*
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(FinancialLocationController::class)
-class FinancialLocationTests {
+class FinancialLocationControllerTest {
     @Autowired
     private lateinit var client: MockMvc
 
@@ -20,14 +26,14 @@ class FinancialLocationTests {
     private lateinit var financialLocationRepository: FinancialLocationRepository
 
     @Test
-    fun `gets all accounts`() {
-        val accounts = arrayOf(
+    fun `gets all financial locations`() {
+        val financialLocations = arrayOf(
             FinancialLocation(1, "Main", "Bankster"),
             FinancialLocation(2, "Savings", "Altbank")
         )
-        given(financialLocationRepository.findAll()).willReturn(accounts.toList())
+        given(financialLocationRepository.findAll()).willReturn(financialLocations.toList())
 
-        client.perform(get("/financial-locations/"))
+        client.perform(get("/locations/"))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$[0].name").value("Main"))
@@ -37,11 +43,11 @@ class FinancialLocationTests {
     }
 
     @Test
-    fun `gets an account by id`() {
-        val account = FinancialLocation(123, "Main", "Bankster")
-        given(financialLocationRepository.findById(123)).willReturn(Optional.of(account))
+    fun `gets a financial location by id`() {
+        val financialLocation = FinancialLocation(123, "Main", "Bankster")
+        given(financialLocationRepository.findById(123)).willReturn(Optional.of(financialLocation))
 
-        client.perform(get("/financial-locations/123"))
+        client.perform(get("/locations/123"))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.name").value("Main"))
@@ -49,32 +55,32 @@ class FinancialLocationTests {
     }
 
     @Test
-    fun `cannot get an account by id when id does not exist`() {
+    fun `cannot get a financial location by id when id does not exist`() {
         given(financialLocationRepository.findById(123)).willReturn(Optional.empty())
 
-        client.perform(get("/financial-locations/123"))
+        client.perform(get("/locations/123"))
             .andExpect(status().isBadRequest)
     }
 
     @Test
-    fun `creates an account`() {
+    fun `creates a financial location`() {
         client.perform(
-            post("/financial-locations/")
+            post("/locations/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""{"name": "Main", "entityName":"Bankster"}""")
         )
             .andExpect(status().isCreated)
-            .andExpect(header().string("Location", "/financial-locations/0"))
+            .andExpect(header().string("Location", "/locations/0"))
     }
 
     @Test
-    fun `updates an account`() {
-        val account = FinancialLocation(123, "Main", "Bankster")
-        given(financialLocationRepository.findById(123)).willReturn(Optional.of(account))
-        given(financialLocationRepository.save(account)).willReturn(account)
+    fun `updates a financial location`() {
+        val financialLocation = FinancialLocation(123, "Main", "Bankster")
+        given(financialLocationRepository.findById(123)).willReturn(Optional.of(financialLocation))
+        given(financialLocationRepository.save(financialLocation)).willReturn(financialLocation)
 
         client.perform(
-            put("/financial-locations/123")
+            put("/locations/123")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""{"id": "123", "name": "Secondary", "entityName": "Bankster"}""")
         )
@@ -82,12 +88,12 @@ class FinancialLocationTests {
     }
 
     @Test
-    fun `does not update an account when URL id does not match body id`() {
-        val account = FinancialLocation(123, "Main", "Bankster")
-        given(financialLocationRepository.findById(123)).willReturn(Optional.of(account))
+    fun `does not update a financial location when URL id does not match body id`() {
+        val financialLocation = FinancialLocation(123, "Main", "Bankster")
+        given(financialLocationRepository.findById(123)).willReturn(Optional.of(financialLocation))
 
         client.perform(
-            put("/financial-locations/123")
+            put("/locations/123")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""{"id": "234", "name": "Secondary", "entityName": "Bankster"}"""")
         )
@@ -95,8 +101,8 @@ class FinancialLocationTests {
     }
 
     @Test
-    fun `deletes an account`() {
-        client.perform(delete("/financial-locations/1234"))
+    fun `deletes a financial location`() {
+        client.perform(delete("/locations/1234"))
             .andExpect(status().isOk)
     }
 }
