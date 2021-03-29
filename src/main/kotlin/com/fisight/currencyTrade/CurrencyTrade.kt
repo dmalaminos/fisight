@@ -5,7 +5,11 @@ import com.fisight.money.Currency
 import com.fisight.money.Money
 import java.time.LocalDateTime
 import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.ManyToOne
 
@@ -17,9 +21,13 @@ enum class CurrencyTradeType {
 @Entity
 data class CurrencyTrade(
     @Id
-    val id: Int,
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Int = 0,
+    @Enumerated(EnumType.STRING)
     val baseCurrency: Currency,
+    @Enumerated(EnumType.STRING)
     val quoteCurrency: Currency,
+    @Enumerated(EnumType.STRING)
     val tradeType: CurrencyTradeType,
     val pricePerBaseUnit: Money,
     val quantity: Double,

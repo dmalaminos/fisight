@@ -2,9 +2,11 @@ package com.fisight.money
 
 import java.math.BigDecimal
 import javax.persistence.Embeddable
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
 
 @Embeddable
-data class Money(val amount: BigDecimal, val currency: Currency) {
+data class Money(val amount: BigDecimal, @Enumerated(EnumType.STRING) val currency: Currency) {
     constructor(amount: Int, currency: Currency) : this(BigDecimal(amount), currency)
     constructor(amount: Double, currency: Currency) : this(BigDecimal.valueOf(amount), currency)
 

@@ -7,56 +7,46 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.util.UriComponentsBuilder
 
 @RestController
-@RequestMapping("/currency-trades")
-class CurrencyTradeController(private val currencyTradeRepository: CurrencyTradeRepository) {
-    @GetMapping("/")
-    fun getAll(): ResponseEntity<MutableIterable<CurrencyTrade>> {
-        return ResponseEntity.ok(currencyTradeRepository.findAll())
+class CurrencyTradeController(private val currencyTradeService: CurrencyTradeService) {
+    @GetMapping("/currency-trades/")
+    fun getAll(): ResponseEntity<List<CurrencyTradeDto>> {
+        return ResponseEntity.ok(currencyTradeService.getAll().toList())
     }
 
-    @GetMapping("/{id}")
-    fun getById(@PathVariable("id") id: Int): ResponseEntity<CurrencyTrade> {
-        val currencyTrade = currencyTradeRepository.findById(id)
+    @GetMapping("/currency-trades/{id}")
+    fun getById(@PathVariable("id") id: Int): ResponseEntity<CurrencyTradeDto> {
+        val currencyTrade = currencyTradeService.getById(id)
         return currencyTrade.map { ResponseEntity.ok(it) }
             .orElse(ResponseEntity.badRequest().build())
     }
 
-    @PostMapping("/")
-    fun save(@RequestBody currencyTrade: CurrencyTrade): ResponseEntity<Any> {
-        val currencyTradeToSave = CurrencyTrade(
-            currencyTrade.id,
-            currencyTrade.baseCurrency,
-            currencyTrade.quoteCurrency,
-            currencyTrade.tradeType,
-            currencyTrade.pricePerBaseUnit,
-            currencyTrade.quantity,
-            currencyTrade.fee,
-            currencyTrade.dateTraded,
-            currencyTrade.location
-        )
-        currencyTradeRepository.save(currencyTradeToSave)
+    @PostMapping("/locations/{locationId}/currency-trades/")
+    fun save(@PathVariable("locationId") locationId: Int, @RequestBody currencyTrade: CurrencyTradeDto): ResponseEntity<Any> {
+        val (currencyTradeId) = currencyTradeService.save(currencyTrade, locationId)
         return ResponseEntity.created(
-            UriComponentsBuilder.fromPath("/currency-trades/{id}").buildAndExpand(currencyTradeToSave.id).toUri()
+            UriComponentsBuilder.fromPath("/currency-trades/{currencyTradeId}").buildAndExpand(currencyTradeId).toUri()
         ).build()
     }
 
-    @PutMapping("/{id}")
-    fun update(@PathVariable("id") id: Int, @RequestBody currencyTrade: CurrencyTrade): ResponseEntity<Any> {
-        if (currencyTrade.id == id) {
-            currencyTradeRepository.save(currencyTrade)
+    @PutMapping("/locations/{locationId}/currency-trades/{id}")
+    fun update(
+        @PathVariable("id") id: Int,
+        @PathVariable("locationId") locationId: Int,
+        @RequestBody currencyTradeDto: CurrencyTradeDto): ResponseEntity<Any> {
+        if (currencyTradeDto.id == id) {
+            currencyTradeService.save(currencyTradeDto, locationId)
             return ResponseEntity.ok().build()
         }
         return ResponseEntity.badRequest().build()
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/currency-trades/{id}")
     fun delete(@PathVariable("id") id: Int): ResponseEntity<Any> {
-        currencyTradeRepository.deleteById(id)
+        currencyTradeService.deleteById(id)
         return ResponseEntity.ok().build()
     }
 }
