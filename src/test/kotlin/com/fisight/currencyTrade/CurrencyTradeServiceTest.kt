@@ -1,7 +1,7 @@
 package com.fisight.currencyTrade
 
-import com.fisight.financialLocation.FinancialLocation
-import com.fisight.financialLocation.FinancialLocationRepository
+import com.fisight.location.Location
+import com.fisight.location.LocationRepository
 import com.fisight.money.Currency
 import com.fisight.money.Money
 import java.time.LocalDateTime
@@ -23,11 +23,11 @@ class CurrencyTradeServiceTest {
     private val currencyTradeRepository: CurrencyTradeRepository = mock()
 
     @Mock
-    private val financialLocationRepository: FinancialLocationRepository = mock()
+    private val locationRepository: LocationRepository = mock()
 
     @BeforeEach
     fun setUp() {
-        currencyTradeService = CurrencyTradeService(currencyTradeRepository, financialLocationRepository)
+        currencyTradeService = CurrencyTradeService(currencyTradeRepository, locationRepository)
     }
 
     @Test
@@ -42,7 +42,7 @@ class CurrencyTradeServiceTest {
                 0.007,
                 Money(3, Currency.EUR),
                 LocalDateTime.of(2021, 3, 24, 23, 44),
-                FinancialLocation(4, "MyExchange", "Bestexchange")
+                Location(4, "MyExchange", "Bestexchange")
             ),
             CurrencyTrade(
                 2,
@@ -53,7 +53,7 @@ class CurrencyTradeServiceTest {
                 0.007,
                 Money(3, Currency.EUR),
                 LocalDateTime.of(2021, 3, 24, 23, 50),
-                FinancialLocation(4, "MyExchange", "Bestexchange")
+                Location(4, "MyExchange", "Bestexchange")
             )
         )
 
@@ -75,7 +75,7 @@ class CurrencyTradeServiceTest {
             0.007,
             Money(3, Currency.EUR),
             LocalDateTime.of(2021, 3, 24, 23, 44),
-            FinancialLocation(4, "MyExchange", "Bestexchange")
+            Location(4, "MyExchange", "Bestexchange")
         )
 
         whenever(currencyTradeRepository.findById(3)).thenReturn(Optional.of(currencyTrade))
@@ -110,7 +110,7 @@ class CurrencyTradeServiceTest {
             null
         )
 
-        val location = FinancialLocation(4, "MyExchange", "Bestexchange")
+        val location = Location(4, "MyExchange", "Bestexchange")
         val currencyTrade = CurrencyTrade(
             0,
             Currency.EUR,
@@ -123,13 +123,13 @@ class CurrencyTradeServiceTest {
             location
         )
 
-        whenever(financialLocationRepository.findById(location.id)).thenReturn(Optional.of(location))
+        whenever(locationRepository.findById(location.id)).thenReturn(Optional.of(location))
         whenever(currencyTradeRepository.save(currencyTrade)).thenReturn(currencyTrade.copy(id = 1))
 
 
         val actual = currencyTradeService.save(currencyTradeDto, 4)
 
-        verify(financialLocationRepository).findById(location.id)
+        verify(locationRepository).findById(location.id)
         verify(currencyTradeRepository).save(currencyTrade)
         assertThat(actual).isEqualTo(currencyTradeDto.copy(id = 1, location = location))
     }
@@ -148,13 +148,13 @@ class CurrencyTradeServiceTest {
             null
         )
 
-        whenever(financialLocationRepository.findById(5)).thenReturn(Optional.empty())
+        whenever(locationRepository.findById(5)).thenReturn(Optional.empty())
 
         Assertions.assertThrows(IllegalArgumentException::class.java) {
             currencyTradeService.save(currencyTradeDto, 5)
         }
 
-        verify(financialLocationRepository).findById(5)
+        verify(locationRepository).findById(5)
         verifyZeroInteractions(currencyTradeRepository)
     }
 

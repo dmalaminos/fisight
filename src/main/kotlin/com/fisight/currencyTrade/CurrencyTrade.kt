@@ -1,6 +1,6 @@
 package com.fisight.currencyTrade
 
-import com.fisight.financialLocation.FinancialLocation
+import com.fisight.location.Location
 import com.fisight.money.Currency
 import com.fisight.money.Money
 import java.time.LocalDateTime
@@ -34,5 +34,5 @@ data class CurrencyTrade(
     val fee: Money,
     val dateTraded: LocalDateTime,
     @ManyToOne(fetch = FetchType.EAGER)
-    val location: FinancialLocation,
+    val location: Location,
 )

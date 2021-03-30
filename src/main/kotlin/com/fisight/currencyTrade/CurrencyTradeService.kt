@@ -1,14 +1,14 @@
 package com.fisight.currencyTrade
 
-import com.fisight.financialLocation.FinancialLocation
-import com.fisight.financialLocation.FinancialLocationRepository
+import com.fisight.location.Location
+import com.fisight.location.LocationRepository
 import java.util.*
 import org.springframework.stereotype.Service
 
 @Service
 class CurrencyTradeService(
     private val currencyTradeRepository: CurrencyTradeRepository,
-    private val locationRepository: FinancialLocationRepository
+    private val locationRepository: LocationRepository
 ) {
     fun getAll(): List<CurrencyTradeDto> {
         return currencyTradeRepository.findAll()
@@ -21,9 +21,9 @@ class CurrencyTradeService(
     }
 
     fun save(currencyTradeDto: CurrencyTradeDto, locationId: Int): CurrencyTradeDto {
-        val financialLocation = locationRepository.findById(locationId)
-        if (financialLocation.isPresent) {
-            val currencyTrade = currencyTradeDtoToEntity(currencyTradeDto, financialLocation.get())
+        val location = locationRepository.findById(locationId)
+        if (location.isPresent) {
+            val currencyTrade = currencyTradeDtoToEntity(currencyTradeDto, location.get())
             return currencyTradeEntityToDto(currencyTradeRepository.save(currencyTrade))
         }
         throw IllegalArgumentException("Location does not exist")
@@ -33,7 +33,7 @@ class CurrencyTradeService(
         currencyTradeRepository.deleteById(id)
     }
 
-    private fun currencyTradeDtoToEntity(currencyTradeDto: CurrencyTradeDto, financialLocation: FinancialLocation): CurrencyTrade {
+    private fun currencyTradeDtoToEntity(currencyTradeDto: CurrencyTradeDto, location: Location): CurrencyTrade {
         return CurrencyTrade(
             currencyTradeDto.id ?: 0,
             currencyTradeDto.baseCurrency,
@@ -43,7 +43,7 @@ class CurrencyTradeService(
             currencyTradeDto.quantity,
             currencyTradeDto.fee,
             currencyTradeDto.dateTraded,
-            financialLocation
+            location
             )
     }
 

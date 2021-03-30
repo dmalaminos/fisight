@@ -1,6 +1,6 @@
 package com.fisight.currencyTrade
 
-import com.fisight.financialLocation.FinancialLocation
+import com.fisight.location.Location
 import com.fisight.money.Currency
 import com.fisight.money.Money
 import java.time.LocalDateTime
@@ -14,5 +14,5 @@ data class CurrencyTradeDto(
     val quantity: Double,
     val fee: Money,
     val dateTraded: LocalDateTime,
-    val location: FinancialLocation?
+    val location: Location?
 )

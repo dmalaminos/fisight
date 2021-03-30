@@ -1,6 +1,6 @@
 package com.fisight.currencyTrade
 
-import com.fisight.financialLocation.FinancialLocation
+import com.fisight.location.Location
 import com.fisight.money.Currency
 import com.fisight.money.Money
 import java.time.LocalDateTime
@@ -38,7 +38,7 @@ class CurrencyTradeControllerTest {
                 0.007,
                 Money(3, Currency.EUR),
                 LocalDateTime.of(2021, 3, 24, 23, 44),
-                FinancialLocation(4, "MyExchange", "Bestexchange")
+                Location(4, "MyExchange", "Bestexchange")
             ),
             CurrencyTradeDto(
                 2,
@@ -49,7 +49,7 @@ class CurrencyTradeControllerTest {
                 0.007,
                 Money(3, Currency.EUR),
                 LocalDateTime.of(2021, 3, 24, 23, 50),
-                FinancialLocation(4, "MyExchange", "Bestexchange")
+                Location(4, "MyExchange", "Bestexchange")
             )
         )
         BDDMockito.given(currencyTradeService.getAll()).willReturn(currencyTrades.toList())
@@ -108,7 +108,7 @@ class CurrencyTradeControllerTest {
             0.007,
             Money(3, Currency.EUR),
             LocalDateTime.of(2021, 3, 24, 23, 44),
-            FinancialLocation(4, "MyExchange", "Bestexchange")
+            Location(4, "MyExchange", "Bestexchange")
         )
         BDDMockito.given(currencyTradeService.getById(1)).willReturn(Optional.of(currencyTrade))
 
@@ -144,7 +144,7 @@ class CurrencyTradeControllerTest {
 
     @Test
     fun `creates a currency trade`() {
-        val financialLocation = FinancialLocation(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster")
         val currencyTradeDto = CurrencyTradeDto(
             null,
             Currency.EUR,
@@ -157,7 +157,7 @@ class CurrencyTradeControllerTest {
             null
         )
         BDDMockito.given(currencyTradeService.save(any(), eq(5)))
-            .willReturn(currencyTradeDto.copy(id = 1, location = financialLocation))
+            .willReturn(currencyTradeDto.copy(id = 1, location = location))
 
         client.perform(
             MockMvcRequestBuilders.post("/locations/5/currency-trades/")
@@ -180,7 +180,7 @@ class CurrencyTradeControllerTest {
 
     @Test
     fun `updates a currency trade`() {
-        val financialLocation = FinancialLocation(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster")
         val currencyTradeDto = CurrencyTradeDto(
             1,
             Currency.EUR,
@@ -190,7 +190,7 @@ class CurrencyTradeControllerTest {
             0.007,
             Money(3, Currency.EUR),
             LocalDateTime.of(2021, 3, 24, 23, 44),
-            financialLocation
+            location
         )
         BDDMockito.given(currencyTradeService.getById(1))
             .willReturn(Optional.of(currencyTradeDto))
@@ -216,7 +216,7 @@ class CurrencyTradeControllerTest {
 
     @Test
     fun `does not update a currency trade when URL id does not match body id`() {
-        val financialLocation = FinancialLocation(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster")
         val currencyTradeDto = CurrencyTradeDto(
             2,
             Currency.EUR,
@@ -226,7 +226,7 @@ class CurrencyTradeControllerTest {
             0.007,
             Money(3, Currency.EUR),
             LocalDateTime.of(2021, 3, 24, 23, 44),
-            financialLocation
+            location
         )
         BDDMockito.given(currencyTradeService.getById(1))
             .willReturn(Optional.of(currencyTradeDto))

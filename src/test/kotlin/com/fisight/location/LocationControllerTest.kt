@@ -1,4 +1,4 @@
-package com.fisight.financialLocation
+package com.fisight.location
 
 import java.util.*
 import org.junit.jupiter.api.Test
@@ -17,21 +17,21 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@WebMvcTest(FinancialLocationController::class)
-class FinancialLocationControllerTest {
+@WebMvcTest(LocationController::class)
+class LocationControllerTest {
     @Autowired
     private lateinit var client: MockMvc
 
     @MockBean
-    private lateinit var financialLocationRepository: FinancialLocationRepository
+    private lateinit var locationRepository: LocationRepository
 
     @Test
-    fun `gets all financial locations`() {
-        val financialLocations = arrayOf(
-            FinancialLocation(1, "Main", "Bankster"),
-            FinancialLocation(2, "Savings", "Altbank")
+    fun `gets all locations`() {
+        val locations = arrayOf(
+            Location(1, "Main", "Bankster"),
+            Location(2, "Savings", "Altbank")
         )
-        given(financialLocationRepository.findAll()).willReturn(financialLocations.toList())
+        given(locationRepository.findAll()).willReturn(locations.toList())
 
         client.perform(get("/locations/"))
             .andExpect(status().isOk)
@@ -43,9 +43,9 @@ class FinancialLocationControllerTest {
     }
 
     @Test
-    fun `gets a financial location by id`() {
-        val financialLocation = FinancialLocation(123, "Main", "Bankster")
-        given(financialLocationRepository.findById(123)).willReturn(Optional.of(financialLocation))
+    fun `gets a location by id`() {
+        val location = Location(123, "Main", "Bankster")
+        given(locationRepository.findById(123)).willReturn(Optional.of(location))
 
         client.perform(get("/locations/123"))
             .andExpect(status().isOk)
@@ -55,15 +55,15 @@ class FinancialLocationControllerTest {
     }
 
     @Test
-    fun `cannot get a financial location by id when id does not exist`() {
-        given(financialLocationRepository.findById(123)).willReturn(Optional.empty())
+    fun `cannot get a location by id when id does not exist`() {
+        given(locationRepository.findById(123)).willReturn(Optional.empty())
 
         client.perform(get("/locations/123"))
             .andExpect(status().isBadRequest)
     }
 
     @Test
-    fun `creates a financial location`() {
+    fun `creates a location`() {
         client.perform(
             post("/locations/")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -74,10 +74,10 @@ class FinancialLocationControllerTest {
     }
 
     @Test
-    fun `updates a financial location`() {
-        val financialLocation = FinancialLocation(123, "Main", "Bankster")
-        given(financialLocationRepository.findById(123)).willReturn(Optional.of(financialLocation))
-        given(financialLocationRepository.save(financialLocation)).willReturn(financialLocation)
+    fun `updates a location`() {
+        val location = Location(123, "Main", "Bankster")
+        given(locationRepository.findById(123)).willReturn(Optional.of(location))
+        given(locationRepository.save(location)).willReturn(location)
 
         client.perform(
             put("/locations/123")
@@ -88,9 +88,9 @@ class FinancialLocationControllerTest {
     }
 
     @Test
-    fun `does not update a financial location when URL id does not match body id`() {
-        val financialLocation = FinancialLocation(123, "Main", "Bankster")
-        given(financialLocationRepository.findById(123)).willReturn(Optional.of(financialLocation))
+    fun `does not update a location when URL id does not match body id`() {
+        val location = Location(123, "Main", "Bankster")
+        given(locationRepository.findById(123)).willReturn(Optional.of(location))
 
         client.perform(
             put("/locations/123")
@@ -101,7 +101,7 @@ class FinancialLocationControllerTest {
     }
 
     @Test
-    fun `deletes a financial location`() {
+    fun `deletes a location`() {
         client.perform(delete("/locations/1234"))
             .andExpect(status().isOk)
     }

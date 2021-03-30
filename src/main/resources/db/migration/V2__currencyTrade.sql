@@ -13,7 +13,7 @@ CREATE TABLE public.currency_trade
     location_id integer,
     CONSTRAINT currency_trade_pkey PRIMARY KEY (id),
     CONSTRAINT fktrjw8yehaa995k84xyry1rhtr FOREIGN KEY (location_id)
-        REFERENCES public.financial_location (id) MATCH SIMPLE
+        REFERENCES public.location (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
