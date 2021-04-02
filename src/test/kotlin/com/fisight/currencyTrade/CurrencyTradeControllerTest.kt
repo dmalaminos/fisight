@@ -65,38 +65,6 @@ class CurrencyTradeControllerTest {
             )
     }
 
-    private fun matchCurrencyTrade(
-        id: Int,
-        baseCurrency: String,
-        quoteCurrency: String,
-        tradeType: String,
-        pricePerBaseUnitAmount: Int,
-        pricePerBaseUnitCurrency: String,
-        quantity: String,
-        feeAmount: Int,
-        feeCurrency: String,
-        dateTraded: String,
-        locationId: Int,
-        locationName: String,
-        locationEntityName: String,
-        position: Int = 0
-    ) = matchAll(
-        MockMvcResultMatchers.jsonPath("$[$position].id").value(id),
-        MockMvcResultMatchers.jsonPath("$[$position].baseCurrency").value(baseCurrency),
-        MockMvcResultMatchers.jsonPath("$[$position].quoteCurrency").value(quoteCurrency),
-        MockMvcResultMatchers.jsonPath("$[$position].tradeType").value(tradeType),
-        MockMvcResultMatchers.jsonPath("$[$position].pricePerBaseUnit.amount").value(pricePerBaseUnitAmount),
-        MockMvcResultMatchers.jsonPath("$[$position].pricePerBaseUnit.currency").value(pricePerBaseUnitCurrency),
-        MockMvcResultMatchers.jsonPath("$[$position].quantity").value(quantity),
-        MockMvcResultMatchers.jsonPath("$[$position].fee.amount").value(feeAmount),
-        MockMvcResultMatchers.jsonPath("$[$position].fee.currency").value(feeCurrency),
-        MockMvcResultMatchers.jsonPath("$[$position].dateTraded").value(dateTraded),
-        MockMvcResultMatchers.jsonPath("$[$position].location.id").value(locationId),
-        MockMvcResultMatchers.jsonPath("$[$position].location.name").value(locationName),
-        MockMvcResultMatchers.jsonPath("$[$position].location.entityName").value(locationEntityName)
-    )
-
-
     @Test
     fun `gets a currency trade by id`() {
         val currencyTrade = CurrencyTradeDto(
@@ -135,7 +103,7 @@ class CurrencyTradeControllerTest {
     }
 
     @Test
-    fun `cannot get a currency by id when id does not exist`() {
+    fun `cannot get a currency trade by id when id does not exist`() {
         BDDMockito.given(currencyTradeService.getById(1)).willReturn(Optional.empty())
 
         client.perform(MockMvcRequestBuilders.get("/currency-trades/1"))
@@ -255,4 +223,35 @@ class CurrencyTradeControllerTest {
         client.perform(MockMvcRequestBuilders.delete("/currency-trades/1234"))
             .andExpect(MockMvcResultMatchers.status().isOk)
     }
+
+    private fun matchCurrencyTrade(
+        id: Int,
+        baseCurrency: String,
+        quoteCurrency: String,
+        tradeType: String,
+        pricePerBaseUnitAmount: Int,
+        pricePerBaseUnitCurrency: String,
+        quantity: String,
+        feeAmount: Int,
+        feeCurrency: String,
+        dateTraded: String,
+        locationId: Int,
+        locationName: String,
+        locationEntityName: String,
+        position: Int = 0
+    ) = matchAll(
+        MockMvcResultMatchers.jsonPath("$[$position].id").value(id),
+        MockMvcResultMatchers.jsonPath("$[$position].baseCurrency").value(baseCurrency),
+        MockMvcResultMatchers.jsonPath("$[$position].quoteCurrency").value(quoteCurrency),
+        MockMvcResultMatchers.jsonPath("$[$position].tradeType").value(tradeType),
+        MockMvcResultMatchers.jsonPath("$[$position].pricePerBaseUnit.amount").value(pricePerBaseUnitAmount),
+        MockMvcResultMatchers.jsonPath("$[$position].pricePerBaseUnit.currency").value(pricePerBaseUnitCurrency),
+        MockMvcResultMatchers.jsonPath("$[$position].quantity").value(quantity),
+        MockMvcResultMatchers.jsonPath("$[$position].fee.amount").value(feeAmount),
+        MockMvcResultMatchers.jsonPath("$[$position].fee.currency").value(feeCurrency),
+        MockMvcResultMatchers.jsonPath("$[$position].dateTraded").value(dateTraded),
+        MockMvcResultMatchers.jsonPath("$[$position].location.id").value(locationId),
+        MockMvcResultMatchers.jsonPath("$[$position].location.name").value(locationName),
+        MockMvcResultMatchers.jsonPath("$[$position].location.entityName").value(locationEntityName)
+    )
 }

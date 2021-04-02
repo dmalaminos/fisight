@@ -4,8 +4,6 @@ import com.fisight.location.Location
 import com.fisight.location.LocationRepository
 import com.fisight.money.Currency
 import com.fisight.money.Money
-import java.time.LocalDateTime
-import java.util.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -15,6 +13,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
+import java.util.*
 
 class CurrencyTradeServiceTest {
     private lateinit var currencyTradeService: CurrencyTradeService
