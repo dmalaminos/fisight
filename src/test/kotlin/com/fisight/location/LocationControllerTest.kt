@@ -17,7 +17,7 @@ class LocationControllerTest {
     private lateinit var client: MockMvc
 
     @MockBean
-    private lateinit var locationRepository: LocationRepository
+    private lateinit var locationService: LocationService
 
     @Test
     fun `gets all locations`() {
@@ -25,7 +25,7 @@ class LocationControllerTest {
             Location(1, "Main", "Bankster"),
             Location(2, "Savings", "Altbank")
         )
-        given(locationRepository.findAll()).willReturn(locations.toList())
+        given(locationService.findAll()).willReturn(locations.toList())
 
         client.perform(get("/locations/"))
             .andExpect(status().isOk)
@@ -39,7 +39,7 @@ class LocationControllerTest {
     @Test
     fun `gets a location by id`() {
         val location = Location(123, "Main", "Bankster")
-        given(locationRepository.findById(123)).willReturn(Optional.of(location))
+        given(locationService.findById(123)).willReturn(Optional.of(location))
 
         client.perform(get("/locations/123"))
             .andExpect(status().isOk)
@@ -50,7 +50,7 @@ class LocationControllerTest {
 
     @Test
     fun `cannot get a location by id when id does not exist`() {
-        given(locationRepository.findById(123)).willReturn(Optional.empty())
+        given(locationService.findById(123)).willReturn(Optional.empty())
 
         client.perform(get("/locations/123"))
             .andExpect(status().isBadRequest)
@@ -58,20 +58,23 @@ class LocationControllerTest {
 
     @Test
     fun `creates a location`() {
+        val location = Location(0, "Main", "Bankster")
+        given(locationService.save(location)).willReturn(location.copy(id = 1))
+
         client.perform(
             post("/locations/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""{"name": "Main", "entityName":"Bankster"}""")
         )
             .andExpect(status().isCreated)
-            .andExpect(header().string("Location", "/locations/0"))
+            .andExpect(header().string("Location", "/locations/1"))
     }
 
     @Test
     fun `updates a location`() {
         val location = Location(123, "Main", "Bankster")
-        given(locationRepository.findById(123)).willReturn(Optional.of(location))
-        given(locationRepository.save(location)).willReturn(location)
+        given(locationService.findById(123)).willReturn(Optional.of(location))
+        given(locationService.save(location)).willReturn(location)
 
         client.perform(
             put("/locations/123")
@@ -84,7 +87,7 @@ class LocationControllerTest {
     @Test
     fun `does not update a location when URL id does not match body id`() {
         val location = Location(123, "Main", "Bankster")
-        given(locationRepository.findById(123)).willReturn(Optional.of(location))
+        given(locationService.findById(123)).willReturn(Optional.of(location))
 
         client.perform(
             put("/locations/123")
