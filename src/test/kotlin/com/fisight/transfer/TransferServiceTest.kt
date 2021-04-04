@@ -59,6 +59,7 @@ class TransferServiceTest {
 
     @Test
     fun `gets all transfers by source location`() {
+        val atTime = LocalDateTime.of(2021, 4, 4, 15, 51)
         val transfers = listOf(
             Transfer(
                 2,
@@ -76,9 +77,9 @@ class TransferServiceTest {
             )
         )
 
-        whenever(transferRepository.findBySource_Id(8)).thenReturn(transfers)
+        whenever(transferRepository.findBySourceIdAndDateTransferredBefore(8, atTime)).thenReturn(transfers)
 
-        val actual = transferService.findAllBySourceLocation(8)
+        val actual = transferService.findAllBySourceLocation(8, atTime)
 
         assertThat(actual.size).isEqualTo(2)
     }

@@ -3,8 +3,6 @@ package com.fisight.currencyTrade
 import com.fisight.location.Location
 import com.fisight.money.Currency
 import com.fisight.money.Money
-import java.time.LocalDateTime
-import java.util.*
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.mockito.kotlin.any
@@ -17,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultMatcher.matchAll
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import java.time.LocalDateTime
+import java.util.*
 
 @WebMvcTest(CurrencyTradeController::class)
 class CurrencyTradeControllerTest {
@@ -52,7 +52,7 @@ class CurrencyTradeControllerTest {
                 Location(4, "MyExchange", "Bestexchange")
             )
         )
-        BDDMockito.given(currencyTradeService.getAll()).willReturn(currencyTrades.toList())
+        BDDMockito.given(currencyTradeService.findAll()).willReturn(currencyTrades.toList())
 
         client.perform(MockMvcRequestBuilders.get("/currency-trades/"))
             .andExpect(MockMvcResultMatchers.status().isOk)
@@ -78,7 +78,7 @@ class CurrencyTradeControllerTest {
             LocalDateTime.of(2021, 3, 24, 23, 44),
             Location(4, "MyExchange", "Bestexchange")
         )
-        BDDMockito.given(currencyTradeService.getById(1)).willReturn(Optional.of(currencyTrade))
+        BDDMockito.given(currencyTradeService.findById(1)).willReturn(Optional.of(currencyTrade))
 
         client.perform(MockMvcRequestBuilders.get("/currency-trades/1"))
             .andExpect(MockMvcResultMatchers.status().isOk)
@@ -104,7 +104,7 @@ class CurrencyTradeControllerTest {
 
     @Test
     fun `cannot get a currency trade by id when id does not exist`() {
-        BDDMockito.given(currencyTradeService.getById(1)).willReturn(Optional.empty())
+        BDDMockito.given(currencyTradeService.findById(1)).willReturn(Optional.empty())
 
         client.perform(MockMvcRequestBuilders.get("/currency-trades/1"))
             .andExpect(MockMvcResultMatchers.status().isBadRequest)
@@ -160,7 +160,7 @@ class CurrencyTradeControllerTest {
             LocalDateTime.of(2021, 3, 24, 23, 44),
             location
         )
-        BDDMockito.given(currencyTradeService.getById(1))
+        BDDMockito.given(currencyTradeService.findById(1))
             .willReturn(Optional.of(currencyTradeDto))
 
         client.perform(
@@ -196,7 +196,7 @@ class CurrencyTradeControllerTest {
             LocalDateTime.of(2021, 3, 24, 23, 44),
             location
         )
-        BDDMockito.given(currencyTradeService.getById(1))
+        BDDMockito.given(currencyTradeService.findById(1))
             .willReturn(Optional.of(currencyTradeDto))
 
         client.perform(

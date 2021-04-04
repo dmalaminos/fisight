@@ -2,21 +2,22 @@ package com.fisight.currencyTrade
 
 import com.fisight.location.Location
 import com.fisight.location.LocationRepository
-import java.util.*
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
+import java.util.*
 
 @Service
 class CurrencyTradeService(
     private val currencyTradeRepository: CurrencyTradeRepository,
     private val locationRepository: LocationRepository
 ) {
-    fun getAll(): List<CurrencyTradeDto> {
+    fun findAll(): List<CurrencyTradeDto> {
         return currencyTradeRepository.findAll()
             .map { currencyTradeEntityToDto(it) }
             .toList()
     }
 
-    fun getById(id: Int): Optional<CurrencyTradeDto> {
+    fun findById(id: Int): Optional<CurrencyTradeDto> {
         return currencyTradeRepository.findById(id).map { currencyTradeEntityToDto(it) }
     }
 
@@ -33,6 +34,10 @@ class CurrencyTradeService(
         currencyTradeRepository.deleteById(id)
     }
 
+    fun findAllForLocationBeforeDate(locationId: Int, atDate: LocalDateTime): List<CurrencyTrade> {
+        return currencyTradeRepository.findByLocation_IdAndDateTradedBefore(locationId, atDate)
+    }
+
     private fun currencyTradeDtoToEntity(currencyTradeDto: CurrencyTradeDto, location: Location): CurrencyTrade {
         return CurrencyTrade(
             currencyTradeDto.id ?: 0,
@@ -44,7 +49,7 @@ class CurrencyTradeService(
             currencyTradeDto.fee,
             currencyTradeDto.dateTraded,
             location
-            )
+        )
     }
 
     private fun currencyTradeEntityToDto(currencyTrade: CurrencyTrade): CurrencyTradeDto {

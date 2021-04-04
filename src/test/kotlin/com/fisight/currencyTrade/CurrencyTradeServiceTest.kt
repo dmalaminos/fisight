@@ -59,7 +59,7 @@ class CurrencyTradeServiceTest {
 
         whenever(currencyTradeRepository.findAll()).thenReturn(currencyTrades)
 
-        val actual = currencyTradeService.getAll()
+        val actual = currencyTradeService.findAll()
 
         assertThat(actual.size).isEqualTo(2)
     }
@@ -80,7 +80,7 @@ class CurrencyTradeServiceTest {
 
         whenever(currencyTradeRepository.findById(3)).thenReturn(Optional.of(currencyTrade))
 
-        val actual = currencyTradeService.getById(3)
+        val actual = currencyTradeService.findById(3)
 
         verify(currencyTradeRepository).findById(3)
         assertThat(actual).isNotEmpty
@@ -90,7 +90,7 @@ class CurrencyTradeServiceTest {
     fun `gets empty when currency trade id does not exist`() {
         whenever(currencyTradeRepository.findById(3)).thenReturn(Optional.empty())
 
-        val actual = currencyTradeService.getById(3)
+        val actual = currencyTradeService.findById(3)
 
         verify(currencyTradeRepository).findById(3)
         assertThat(actual).isEmpty

@@ -16,8 +16,12 @@ data class Money(val amount: BigDecimal, @Enumerated(EnumType.STRING) val curren
 
     operator fun plus(money: Money): Money = isSameCurrency(money) { copy(amount = this.amount + money.amount) }
     operator fun minus(money: Money): Money = isSameCurrency(money) { copy(amount = this.amount - money.amount) }
-
+    operator fun times(factor: Int): Money = this * BigDecimal(factor)
+    operator fun times(factor: Double): Money = this * BigDecimal.valueOf(factor)
+    operator fun times(factor: BigDecimal): Money = copy(amount = (this.amount * factor).stripTrailingZeros())
     operator fun compareTo(money: Money): Int = isSameCurrency(money) { this.amount.compareTo(money.amount) }
+
+    fun negate() = copy(amount = this.amount.negate())
 
     private fun <T> isSameCurrency(money: Money, operation: (Money) -> T): T {
         return if (currency == money.currency) {

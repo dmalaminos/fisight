@@ -46,6 +46,22 @@ class MoneyTest {
         assertThrows(IllegalArgumentException::class.java) { Money(1.23, Currency.EUR) - Money(3.21, Currency.USD) }
     }
 
+    @ParameterizedTest
+    @CsvSource(
+        "1.23, 0.0, 0",
+        "1.23, 3.21, 3.9483",
+        "1.23, -3.21, -3.9483",
+        "1.23, 4.12321, 5.0715483"
+    )
+    fun `multiplies amounts of money`(
+        first: Double,
+        second: Double,
+        product: BigDecimal
+    ) {
+        assertEquals(Money(product, Currency.EUR), Money(first, Currency.EUR) * second)
+        assertEquals(Money(product, Currency.BTC), Money(first, Currency.BTC) * BigDecimal.valueOf(second))
+    }
+
     @Test
     fun `compares amounts of money`() {
         assertTrue((Money(3.21, Currency.EUR) > Money(1.23, Currency.EUR)))
@@ -56,5 +72,12 @@ class MoneyTest {
         assertTrue((Money(1.23, Currency.EUR) <= Money(3.21, Currency.EUR)))
         assertTrue((Money(1.23, Currency.EUR) == Money(1.23, Currency.EUR)))
         assertTrue((Money(1.23, Currency.EUR) != Money(3.21, Currency.EUR)))
+    }
+
+    @Test
+    fun `negates amounts of money`() {
+        assertEquals(Money(-0.75, Currency.EUR), Money(0.75, Currency.EUR).negate())
+        assertEquals(Money(0, Currency.ADA), Money(0, Currency.ADA).negate())
+        assertEquals(Money(0.125, Currency.BTC), Money(-0.125, Currency.BTC).negate())
     }
 }
