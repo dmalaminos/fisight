@@ -8,5 +8,6 @@ data class TransferDto(
     val sourceLocationId: Int,
     val targetLocationId: Int,
     val amount: Money,
+    val fee: Money,
     val dateTransferred: LocalDateTime
 )

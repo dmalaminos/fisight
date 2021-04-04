@@ -37,6 +37,18 @@ class BalanceService(
             .values.toList()
     }
 
+    private fun getTransferOperations(
+        locationId: Int,
+        atDate: LocalDateTime
+    ) = transferService.findAllForLocationBeforeDate(locationId, atDate)
+        .flatMap {
+            val relativeAmount = if (it.source.id == locationId) it.amount.negate() else it.amount
+            listOf(
+                BalanceOperation(relativeAmount, it.dateTransferred),
+                BalanceOperation(it.fee.negate(), it.dateTransferred)
+            )
+        }
+
     private fun getCurrencyTradeOperations(
         locationId: Int,
         atDate: LocalDateTime
@@ -53,8 +65,9 @@ class BalanceService(
         BalanceOperation(
             Money(currencyTrade.pricePerBaseUnit.times(currencyTrade.quantity).amount, currencyTrade.quoteCurrency),
             currencyTrade.dateTraded
-        ), //TODO: subtract fees
-        BalanceOperation(Money(currencyTrade.quantity, currencyTrade.baseCurrency).negate(), currencyTrade.dateTraded)
+        ),
+        BalanceOperation(Money(currencyTrade.quantity, currencyTrade.baseCurrency).negate(), currencyTrade.dateTraded),
+        BalanceOperation(currencyTrade.fee.negate(), currencyTrade.dateTraded)
     )
 
     private fun balanceOperationsForCurrencyBuyTrade(currencyTrade: CurrencyTrade) = listOf(
@@ -64,18 +77,10 @@ class BalanceService(
                 currencyTrade.quoteCurrency
             ),
             currencyTrade.dateTraded
-        ), //TODO: subtract fees
-        BalanceOperation(Money(currencyTrade.quantity, currencyTrade.baseCurrency), currencyTrade.dateTraded)
+        ),
+        BalanceOperation(Money(currencyTrade.quantity, currencyTrade.baseCurrency), currencyTrade.dateTraded),
+        BalanceOperation(currencyTrade.fee.negate(), currencyTrade.dateTraded)
     )
-
-    private fun getTransferOperations(
-        locationId: Int,
-        atDate: LocalDateTime
-    ) = transferService.findAllForLocationBeforeDate(locationId, atDate)
-        .map {
-            val relativeAmount = if (it.source.id == locationId) it.amount.negate() else it.amount
-            BalanceOperation(relativeAmount, it.dateTransferred)
-        }
 }
 
 data class BalanceOperation(val amount: Money, val dateExecuted: LocalDateTime)

@@ -51,6 +51,7 @@ class TransferService(
             source,
             target,
             transferDto.amount,
+            transferDto.fee,
             transferDto.dateTransferred
         )
     }
@@ -61,6 +62,7 @@ class TransferService(
             transfer.source.id,
             transfer.target.id,
             transfer.amount,
+            transfer.fee,
             transfer.dateTransferred
         )
     }

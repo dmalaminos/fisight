@@ -32,6 +32,7 @@ class TransferControllerTest {
                 5,
                 8,
                 Money(100, Currency.EUR),
+                Money(1, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 17, 21)
             ),
             TransferDto(
@@ -39,6 +40,7 @@ class TransferControllerTest {
                 8,
                 5,
                 Money(5, Currency.EUR),
+                Money(0, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 20, 21)
             )
         )
@@ -51,11 +53,15 @@ class TransferControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].targetLocationId").value("8"))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].amount.amount").value("100"))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].amount.currency").value("EUR"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].fee.amount").value("1"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].fee.currency").value("EUR"))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].dateTransferred").value("2021-04-02T17:21:00"))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].sourceLocationId").value("8"))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].targetLocationId").value("5"))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].amount.amount").value("5"))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].amount.currency").value("EUR"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].fee.amount").value("0"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].fee.currency").value("EUR"))
             .andExpect(MockMvcResultMatchers.jsonPath("$[1].dateTransferred").value("2021-04-02T20:21:00"))
     }
 
@@ -66,6 +72,7 @@ class TransferControllerTest {
             5,
             8,
             Money(100, Currency.EUR),
+            Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
         BDDMockito.given(transferService.findById(21)).willReturn(Optional.of(transferDto))
@@ -80,6 +87,8 @@ class TransferControllerTest {
                     MockMvcResultMatchers.jsonPath("$.targetLocationId").value("8"),
                     MockMvcResultMatchers.jsonPath("$.amount.amount").value("100"),
                     MockMvcResultMatchers.jsonPath("$.amount.currency").value("EUR"),
+                    MockMvcResultMatchers.jsonPath("$.fee.amount").value("1"),
+                    MockMvcResultMatchers.jsonPath("$.fee.currency").value("EUR"),
                     MockMvcResultMatchers.jsonPath("$.dateTransferred").value("2021-04-02T17:21:00")
                 )
             )
@@ -100,6 +109,7 @@ class TransferControllerTest {
             5,
             8,
             Money(100, Currency.EUR),
+            Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
         BDDMockito.given(transferService.save(any()))
@@ -113,6 +123,7 @@ class TransferControllerTest {
                      { "sourceLocationId": "5",
                        "targetLocationId": "8",
                        "amount": { "amount": 100, "currency": "EUR" },
+                       "fee": { "amount": 1, "currency": "EUR" },
                        "dateTransferred": "2021-04-02T17:21:00" }
                      """.trimMargin()
                 )
@@ -128,6 +139,7 @@ class TransferControllerTest {
             5,
             8,
             Money(100, Currency.EUR),
+            Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
         BDDMockito.given(transferService.findById(22))
@@ -142,6 +154,7 @@ class TransferControllerTest {
                        "sourceLocationId": "5",
                        "targetLocationId": "7",
                        "amount": { "amount": 10, "currency": "EUR" },
+                       "fee": { "amount": 0.5, "currency": "EUR" },
                        "dateTransferred": "2021-04-02T18:21:00" }
                      """.trimMargin()
                 )
@@ -160,6 +173,7 @@ class TransferControllerTest {
                        "sourceLocationId": "4",
                        "targetLocationId": "7",
                        "amount": { "amount": 10, "currency": "EUR" },
+                       "fee": { "amount": 0, "currency": "EUR" },
                        "dateTransferred": "2021-04-02T18:21:00" }
                      """.trimMargin()
                 )

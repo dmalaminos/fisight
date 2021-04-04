@@ -54,6 +54,7 @@ class BalanceServiceTest {
                 location21,
                 location42,
                 Money(45, Currency.EUR),
+                Money(0, Currency.EUR),
                 LocalDateTime.of(2021, 2, 2, 11, 34)
             ),
             Transfer(
@@ -61,6 +62,7 @@ class BalanceServiceTest {
                 location42,
                 location21,
                 Money(20, Currency.EUR),
+                Money(0, Currency.EUR),
                 LocalDateTime.of(2021, 3, 31, 14, 22)
             ),
             Transfer(
@@ -68,6 +70,7 @@ class BalanceServiceTest {
                 location21,
                 location42,
                 Money(100, Currency.USD),
+                Money(1.25, Currency.USD),
                 LocalDateTime.of(2021, 4, 2, 23, 30)
             )
         )
@@ -80,7 +83,7 @@ class BalanceServiceTest {
         verifyNoMoreInteractions(locationRepository)
 
         val expectedBalance = Balance(
-            listOf(Money(25, Currency.EUR), Money(100, Currency.USD)),
+            listOf(Money(25, Currency.EUR), Money(98.75, Currency.USD)),
             atDate
         )
         assertThat(balance).isEqualTo(expectedBalance)
@@ -116,6 +119,7 @@ class BalanceServiceTest {
                 location21,
                 location42,
                 Money(100.125, Currency.EUR),
+                Money(2, Currency.EUR),
                 LocalDateTime.of(2021, 2, 2, 11, 34)
             )
         )
@@ -153,7 +157,7 @@ class BalanceServiceTest {
         verifyNoMoreInteractions(locationRepository)
 
         val expectedBalance = Balance(
-            listOf(Money(94.48963460, Currency.EUR), Money(0.000155, Currency.BTC)),
+            listOf(Money(92.48963460, Currency.EUR), Money(0.000155, Currency.BTC)),
             atDate
         )
         assertThat(balance).isEqualTo(expectedBalance)

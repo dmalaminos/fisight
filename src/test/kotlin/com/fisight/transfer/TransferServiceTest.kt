@@ -39,6 +39,7 @@ class TransferServiceTest {
                 Location(5, "Primary bank", "Bankster"),
                 Location(8, "Secondary bank", "NuBank"),
                 Money(100, Currency.EUR),
+                Money(1, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 17, 21)
             ),
             Transfer(
@@ -46,6 +47,7 @@ class TransferServiceTest {
                 Location(8, "Secondary bank", "NuBank"),
                 Location(5, "Primary bank", "Bankster"),
                 Money(5, Currency.EUR),
+                Money(0, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 20, 21)
             )
         )
@@ -66,6 +68,7 @@ class TransferServiceTest {
                 Location(8, "Secondary bank", "NuBank"),
                 Location(5, "Primary bank", "Bankster"),
                 Money(200, Currency.EUR),
+                Money(2, Currency.EUR),
                 LocalDateTime.of(2021, 2, 26, 12, 38)
             ),
             Transfer(
@@ -73,6 +76,7 @@ class TransferServiceTest {
                 Location(8, "Secondary bank", "NuBank"),
                 Location(5, "Primary bank", "Bankster"),
                 Money(5, Currency.EUR),
+                Money(0, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 20, 21)
             )
         )
@@ -91,6 +95,7 @@ class TransferServiceTest {
             Location(5, "Primary bank", "Bankster"),
             Location(8, "Secondary bank", "NuBank"),
             Money(100, Currency.EUR),
+            Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
 
@@ -119,6 +124,7 @@ class TransferServiceTest {
             5,
             8,
             Money(100, Currency.EUR),
+            Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
 
@@ -129,6 +135,7 @@ class TransferServiceTest {
             sourceLocation,
             targetLocation,
             Money(100, Currency.EUR),
+            Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
 
@@ -152,6 +159,7 @@ class TransferServiceTest {
             5,
             88,
             Money(100, Currency.EUR),
+            Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
 

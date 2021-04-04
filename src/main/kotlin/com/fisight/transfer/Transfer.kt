@@ -15,6 +15,6 @@ data class Transfer(
     @ManyToOne(fetch = FetchType.EAGER)
     val target: Location,
     val amount: Money,
+    val fee: Money,
     val dateTransferred: LocalDateTime
-    //TODO: add fee
 )
