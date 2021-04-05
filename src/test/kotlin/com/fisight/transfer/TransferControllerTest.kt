@@ -1,5 +1,6 @@
 package com.fisight.transfer
 
+import com.fisight.location.Location
 import com.fisight.money.Currency
 import com.fisight.money.Money
 import org.junit.jupiter.api.Test
@@ -24,27 +25,32 @@ class TransferControllerTest {
     @MockBean
     private lateinit var transferService: TransferService
 
+    @MockBean
+    private lateinit var mapper: TransferMapper
+
     @Test
     fun `gets all transfers`() {
         val transfers = listOf(
-            TransferDto(
+            Transfer(
                 1,
-                5,
-                8,
+                Location(5, "Main", "Bankster"),
+                Location(8, "Secondary", "NuBank"),
                 Money(100, Currency.EUR),
                 Money(1, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 17, 21)
             ),
-            TransferDto(
+            Transfer(
                 3,
-                8,
-                5,
+                Location(8, "Secondary", "NuBank"),
+                Location(5, "Main", "Bankster"),
                 Money(5, Currency.EUR),
                 Money(0, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 20, 21)
             )
         )
-        BDDMockito.given(transferService.findAll()).willReturn(transfers.toList())
+        BDDMockito.given(transferService.findAll()).willReturn(transfers)
+        BDDMockito.given(mapper.toDto(transfers[0])).willCallRealMethod()
+        BDDMockito.given(mapper.toDto(transfers[1])).willCallRealMethod()
 
         client.perform(MockMvcRequestBuilders.get("/transfers/"))
             .andExpect(MockMvcResultMatchers.status().isOk)
@@ -67,15 +73,16 @@ class TransferControllerTest {
 
     @Test
     fun `gets a transfer by id`() {
-        val transferDto = TransferDto(
+        val transfer = Transfer(
             21,
-            5,
-            8,
+            Location(5, "Main", "Bankster"),
+            Location(8, "Secondary", "NuBank"),
             Money(100, Currency.EUR),
             Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
-        BDDMockito.given(transferService.findById(21)).willReturn(Optional.of(transferDto))
+        BDDMockito.given(transferService.findById(21)).willReturn(Optional.of(transfer))
+        BDDMockito.given(mapper.toDto(transfer)).willCallRealMethod()
 
         client.perform(MockMvcRequestBuilders.get("/transfers/21"))
             .andExpect(MockMvcResultMatchers.status().isOk)
@@ -104,16 +111,16 @@ class TransferControllerTest {
 
     @Test
     fun `creates a transfer`() {
-        val transferDto = TransferDto(
+        val transfer = Transfer(
             22,
-            5,
-            8,
+            Location(5, "Main", "Bankster"),
+            Location(8, "Secondary", "NuBank"),
             Money(100, Currency.EUR),
             Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
         BDDMockito.given(transferService.save(any()))
-            .willReturn(transferDto)
+            .willReturn(transfer)
 
         client.perform(
             MockMvcRequestBuilders.post("/transfers/")
@@ -134,16 +141,16 @@ class TransferControllerTest {
 
     @Test
     fun `updates a transfer`() {
-        val transferDto = TransferDto(
+        val transfer = Transfer(
             22,
-            5,
-            8,
+            Location(5, "Main", "Bankster"),
+            Location(8, "Secondary", "NuBank"),
             Money(100, Currency.EUR),
             Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
         BDDMockito.given(transferService.findById(22))
-            .willReturn(Optional.of(transferDto))
+            .willReturn(Optional.of(transfer))
 
         client.perform(
             MockMvcRequestBuilders.put("/transfers/22")

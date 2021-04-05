@@ -1,6 +1,9 @@
 package com.fisight.comment
 
 import com.fisight.location.Location
+import com.fisight.money.Currency
+import com.fisight.money.Money
+import com.fisight.transfer.Transfer
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,6 +13,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import java.time.LocalDateTime
 import java.util.*
 
 @WebMvcTest(CommentController::class)
@@ -30,6 +34,31 @@ class CommentControllerTest {
         BDDMockito.given(commentService.findAllForLocation(1)).willReturn(comments)
 
         client.perform(MockMvcRequestBuilders.get("/locations/1/comments/"))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].text").value("Something"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].text").value("More text"))
+    }
+
+    @Test
+    fun `gets all comments for transfer`() {
+        val sourceLocation = Location(42, "Main", "Bankster")
+        val targetLocation = Location(21, "Secondary", "NuBank")
+        val transfer = Transfer(
+            11,
+            sourceLocation,
+            targetLocation,
+            Money(4, Currency.EUR),
+            Money.zero(Currency.EUR),
+            LocalDateTime.of(2021, 4, 5, 23, 5)
+        )
+        val comments = listOf(
+            Comment(11, "Something", transfer),
+            Comment(12, "More text", transfer),
+        )
+        BDDMockito.given(commentService.findAllForTransfer(11)).willReturn(comments)
+
+        client.perform(MockMvcRequestBuilders.get("/transfers/11/comments/"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].text").value("Something"))
@@ -65,6 +94,31 @@ class CommentControllerTest {
 
         client.perform(
             MockMvcRequestBuilders.post("/locations/42/comments/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""{"text": "Something"}""")
+        )
+            .andExpect(MockMvcResultMatchers.status().isCreated)
+            .andExpect(MockMvcResultMatchers.header().string("Location", "/comments/11"))
+    }
+
+    @Test
+    fun `creates a comment for transfer`() {
+        val sourceLocation = Location(42, "Main", "Bankster")
+        val targetLocation = Location(21, "Secondary", "NuBank")
+        val transfer = Transfer(
+            11,
+            sourceLocation,
+            targetLocation,
+            Money(4, Currency.EUR),
+            Money.zero(Currency.EUR),
+            LocalDateTime.of(2021, 4, 5, 23, 5)
+        )
+        val commentDto = CommentDto(null, "Something")
+        BDDMockito.given(commentService.saveForTransfer(11, commentDto))
+            .willReturn(Comment(11, "Something", transfer))
+
+        client.perform(
+            MockMvcRequestBuilders.post("/transfers/11/comments/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""{"text": "Something"}""")
         )

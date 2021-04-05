@@ -1,6 +1,5 @@
 package com.fisight.transfer
 
-import com.fisight.location.Location
 import com.fisight.location.LocationRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -9,22 +8,26 @@ import java.util.*
 @Service
 class TransferService(
     private val transferRepository: TransferRepository,
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val mapper: TransferMapper
 ) {
-    fun findAll(): List<TransferDto> {
-        return transferRepository.findAll().map { transferEntityToDto(it) }
+    fun findAll(): List<Transfer> {
+        return transferRepository.findAll().toList()
     }
 
-    fun findAllBySourceLocation(sourceLocationId: Int, atDate: LocalDateTime = LocalDateTime.now()): List<TransferDto> {
+    fun findAllBySourceLocation(sourceLocationId: Int, atDate: LocalDateTime = LocalDateTime.now()): List<Transfer> {
         return transferRepository.findBySourceIdAndDateTransferredBefore(sourceLocationId, atDate)
-            .map { transferEntityToDto(it) }
     }
 
-    fun findById(id: Int): Optional<TransferDto> {
-        return transferRepository.findById(id).map { transferEntityToDto(it) }
+    fun findAllForLocationBeforeDate(id: Int, atDate: LocalDateTime = LocalDateTime.now()): List<Transfer> {
+        return transferRepository.findBySourceIdOrTargetIdAndDateTransferredBefore(id, id, atDate)
     }
 
-    fun save(transferDto: TransferDto): TransferDto {
+    fun findById(id: Int): Optional<Transfer> {
+        return transferRepository.findById(id)
+    }
+
+    fun save(transferDto: TransferDto): Transfer {
         val source = locationRepository.findById(transferDto.sourceLocationId)
         val target = locationRepository.findById(transferDto.targetLocationId)
 
@@ -32,38 +35,10 @@ class TransferService(
             throw IllegalArgumentException("Not all transfer locations were found")
         }
 
-        return transferEntityToDto(
-            transferRepository.save(transferDtoToEntity(transferDto, source.get(), target.get()))
-        )
+        return transferRepository.save(mapper.toEntity(transferDto, source.get(), target.get()))
     }
 
     fun deleteById(id: Int) {
         transferRepository.deleteById(id)
-    }
-
-    fun findAllForLocationBeforeDate(id: Int, atDate: LocalDateTime = LocalDateTime.now()): List<Transfer> {
-        return transferRepository.findBySourceIdOrTargetIdAndDateTransferredBefore(id, id, atDate)
-    }
-
-    private fun transferDtoToEntity(transferDto: TransferDto, source: Location, target: Location): Transfer {
-        return Transfer(
-            transferDto.id ?: 0,
-            source,
-            target,
-            transferDto.amount,
-            transferDto.fee,
-            transferDto.dateTransferred
-        )
-    }
-
-    private fun transferEntityToDto(transfer: Transfer): TransferDto {
-        return TransferDto(
-            transfer.id,
-            transfer.source.id,
-            transfer.target.id,
-            transfer.amount,
-            transfer.fee,
-            transfer.dateTransferred
-        )
     }
 }

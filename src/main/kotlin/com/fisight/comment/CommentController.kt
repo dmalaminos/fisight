@@ -11,6 +11,11 @@ class CommentController(private val commentService: CommentService) {
         return ResponseEntity.ok(commentService.findAllForLocation(locationId))
     }
 
+    @GetMapping("/transfers/{transferId}/comments/")
+    fun getAllForTransfer(@PathVariable("transferId") transferId: Int): ResponseEntity<List<Comment>> {
+        return ResponseEntity.ok(commentService.findAllForTransfer(transferId))
+    }
+
     @GetMapping("/comments/{id}")
     fun getById(@PathVariable("id") id: Int): ResponseEntity<Comment> {
         val comment = commentService.findById(id)
@@ -24,6 +29,17 @@ class CommentController(private val commentService: CommentService) {
         @RequestBody comment: CommentDto
     ): ResponseEntity<Any> {
         val commentSaved = commentService.saveForLocation(locationId, comment)
+        return ResponseEntity.created(
+            UriComponentsBuilder.fromPath("/comments/{id}").buildAndExpand(commentSaved.id).toUri()
+        ).build()
+    }
+
+    @PostMapping("/transfers/{transferId}/comments/")
+    fun saveForTransfer(
+        @PathVariable("transferId") transferId: Int,
+        @RequestBody comment: CommentDto
+    ): ResponseEntity<Any> {
+        val commentSaved = commentService.saveForTransfer(transferId, comment)
         return ResponseEntity.created(
             UriComponentsBuilder.fromPath("/comments/{id}").buildAndExpand(commentSaved.id).toUri()
         ).build()

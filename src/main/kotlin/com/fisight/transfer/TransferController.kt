@@ -6,22 +6,24 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @RestController
 class TransferController(
-    private val transferService: TransferService
+    private val transferService: TransferService,
+    private val mapper: TransferMapper
 ) {
     @GetMapping("/transfers/")
     fun getAll(): ResponseEntity<List<TransferDto>> {
-        return ResponseEntity.ok(transferService.findAll())
+        val list = transferService.findAll().map { mapper.toDto(it) }
+        return ResponseEntity.ok(list)
     }
 
     @GetMapping("/locations/{locationId}/transfers/")
     fun getAllBySourceLocation(@PathVariable("locationId") locationId: Int): ResponseEntity<List<TransferDto>> {
-        return ResponseEntity.ok(transferService.findAllBySourceLocation(locationId))
+        return ResponseEntity.ok(transferService.findAllBySourceLocation(locationId).map { mapper.toDto(it) })
     }
 
     @GetMapping("/transfers/{id}")
     fun getById(@PathVariable("id") id: Int): ResponseEntity<TransferDto> {
-        val transfer = transferService.findById(id)
-        return transfer.map { ResponseEntity.ok(it) }
+        return transferService.findById(id)
+            .map { ResponseEntity.ok(mapper.toDto(it)) }
             .orElse(ResponseEntity.badRequest().build())
     }
 

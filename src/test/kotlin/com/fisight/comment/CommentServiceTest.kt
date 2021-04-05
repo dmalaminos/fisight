@@ -2,10 +2,15 @@ package com.fisight.comment
 
 import com.fisight.location.Location
 import com.fisight.location.LocationService
+import com.fisight.money.Currency
+import com.fisight.money.Money
+import com.fisight.transfer.Transfer
+import com.fisight.transfer.TransferService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.mockito.kotlin.*
+import java.time.LocalDateTime
 import java.util.*
 
 
@@ -18,9 +23,12 @@ class CommentServiceTest {
     @Mock
     private val locationService: LocationService = mock()
 
+    @Mock
+    private val transferService: TransferService = mock()
+
     @BeforeEach
     fun setUp() {
-        commentService = CommentService(commentRepository, locationService)
+        commentService = CommentService(commentRepository, locationService, transferService)
     }
 
     @Test
@@ -30,6 +38,15 @@ class CommentServiceTest {
         verify(commentRepository).findByCommentedEntityIdAndEntityType(12, "Location")
         verifyNoMoreInteractions(commentRepository)
         verifyZeroInteractions(locationService)
+    }
+
+    @Test
+    fun `gets all comments by transfer`() {
+        commentService.findAllForTransfer(11)
+
+        verify(commentRepository).findByCommentedEntityIdAndEntityType(11, "Transfer")
+        verifyNoMoreInteractions(commentRepository)
+        verifyZeroInteractions(transferService)
     }
 
     @Test
@@ -55,6 +72,32 @@ class CommentServiceTest {
         verify(commentRepository).save(comment)
         verifyNoMoreInteractions(locationService)
         verifyNoMoreInteractions(commentRepository)
+    }
+
+    @Test
+    fun `saves a new comment for transfer`() {
+        val sourceLocation = Location(42, "location", "entity")
+        val targetLocation = Location(21, "anotherLocation", "anotherEntity")
+        val transfer = Transfer(
+            11,
+            sourceLocation,
+            targetLocation,
+            Money(4, Currency.EUR),
+            Money.zero(Currency.EUR),
+            LocalDateTime.of(2021, 4, 5, 23, 0)
+        )
+        val comment = Comment(0, "Something", transfer)
+        val commentDto = CommentDto(null, "Something")
+        whenever(transferService.findById(11)).thenReturn(Optional.of(transfer))
+        whenever(commentRepository.save(comment)).thenReturn(comment.copy(id = 1))
+
+        commentService.saveForTransfer(11, commentDto)
+
+        verify(transferService).findById(11)
+        verify(commentRepository).save(comment)
+        verifyNoMoreInteractions(transferService)
+        verifyNoMoreInteractions(commentRepository)
+        verifyZeroInteractions(locationService)
     }
 
     @Test

@@ -25,10 +25,12 @@ class TransferServiceTest {
     @Mock
     private val locationRepository: LocationRepository = mock()
 
+    @Mock
+    private val mapper: TransferMapper = mock()
 
     @BeforeEach
     fun setUp() {
-        transferService = TransferService(transferRepository, locationRepository)
+        transferService = TransferService(transferRepository, locationRepository, mapper)
     }
 
     @Test
@@ -141,6 +143,7 @@ class TransferServiceTest {
 
         whenever(locationRepository.findById(sourceLocation.id)).thenReturn(Optional.of(sourceLocation))
         whenever(locationRepository.findById(targetLocation.id)).thenReturn(Optional.of(targetLocation))
+        whenever(mapper.toEntity(transferDto, sourceLocation, targetLocation)).thenReturn(transfer)
         whenever(transferRepository.save(transfer)).thenReturn(transfer.copy(id = 21))
 
 
@@ -149,7 +152,7 @@ class TransferServiceTest {
         verify(locationRepository).findById(sourceLocation.id)
         verify(locationRepository).findById(targetLocation.id)
         verify(transferRepository).save(transfer)
-        assertThat(actual).isEqualTo(transferDto.copy(id = 21))
+        assertThat(actual).isEqualTo(transfer.copy(id = 21))
     }
 
     @Test
