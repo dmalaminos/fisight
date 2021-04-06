@@ -1,5 +1,6 @@
 package com.fisight.comment
 
+import com.fisight.currencyTrade.CurrencyTradeService
 import com.fisight.location.Location
 import com.fisight.location.LocationService
 import com.fisight.transfer.TransferService
@@ -7,9 +8,12 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class CommentService(private val commentRepository: CommentRepository,
-                     private val locationService: LocationService,
-private val transferService: TransferService) {
+class CommentService(
+    private val commentRepository: CommentRepository,
+    private val locationService: LocationService,
+    private val transferService: TransferService,
+    private val currencyTradeService: CurrencyTradeService
+) {
     fun saveForLocation(locationId: Int, commentDto: CommentDto): Comment {
         return locationService.findById(locationId)
             .map { commentRepository.save(locationCommentDtoToEntity(commentDto, it)) }
@@ -19,7 +23,13 @@ private val transferService: TransferService) {
     fun saveForTransfer(transferId: Int, commentDto: CommentDto): Comment {
         return transferService.findById(transferId)
             .map { commentRepository.save(Comment(commentDto.id ?: 0, commentDto.text, it)) }
-            .orElseThrow { IllegalArgumentException("Location does not exist") }
+            .orElseThrow { IllegalArgumentException("Transfer does not exist") }
+    }
+
+    fun saveForCurrencyTrade(currencyTradeId: Int, commentDto: CommentDto): Comment {
+        return currencyTradeService.findById(currencyTradeId)
+            .map { commentRepository.save(Comment(commentDto.id ?: 0, commentDto.text, it)) }
+            .orElseThrow { IllegalArgumentException("Currency trade does not exist") }
     }
 
     fun save(commentDto: CommentDto): Comment {
@@ -46,6 +56,10 @@ private val transferService: TransferService) {
 
     fun findAllForTransfer(transferId: Int): List<Comment> {
         return commentRepository.findByCommentedEntityIdAndEntityType(transferId, "Transfer")
+    }
+
+    fun findAllForCurrencyTrade(currencyTradeId: Int): List<Comment> {
+        return commentRepository.findByCommentedEntityIdAndEntityType(currencyTradeId, "CurrencyTrade")
     }
 
     private fun locationCommentDtoToEntity(

@@ -25,9 +25,12 @@ class CurrencyTradeServiceTest {
     @Mock
     private val locationRepository: LocationRepository = mock()
 
+    @Mock
+    private val currencyTradeMapper: CurrencyTradeMapper = mock()
+
     @BeforeEach
     fun setUp() {
-        currencyTradeService = CurrencyTradeService(currencyTradeRepository, locationRepository)
+        currencyTradeService = CurrencyTradeService(currencyTradeRepository, locationRepository, currencyTradeMapper)
     }
 
     @Test
@@ -124,6 +127,7 @@ class CurrencyTradeServiceTest {
         )
 
         whenever(locationRepository.findById(location.id)).thenReturn(Optional.of(location))
+        whenever(currencyTradeMapper.toEntity(currencyTradeDto, location)).thenReturn(currencyTrade)
         whenever(currencyTradeRepository.save(currencyTrade)).thenReturn(currencyTrade.copy(id = 1))
 
 
@@ -131,7 +135,7 @@ class CurrencyTradeServiceTest {
 
         verify(locationRepository).findById(location.id)
         verify(currencyTradeRepository).save(currencyTrade)
-        assertThat(actual).isEqualTo(currencyTradeDto.copy(id = 1, location = location))
+        assertThat(actual).isEqualTo(currencyTrade.copy(id = 1))
     }
 
     @Test

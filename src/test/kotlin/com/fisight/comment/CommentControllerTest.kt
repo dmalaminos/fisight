@@ -1,5 +1,7 @@
 package com.fisight.comment
 
+import com.fisight.currencyTrade.CurrencyTrade
+import com.fisight.currencyTrade.CurrencyTradeType
 import com.fisight.location.Location
 import com.fisight.money.Currency
 import com.fisight.money.Money
@@ -66,6 +68,33 @@ class CommentControllerTest {
     }
 
     @Test
+    fun `gets all comments for currency trade`() {
+        val location = Location(42, "Main", "Bankster")
+        val currencyTrade = CurrencyTrade(
+            11,
+            Currency.BTC,
+            Currency.EUR,
+            CurrencyTradeType.Buy,
+            Money(47000, Currency.EUR),
+            0.0023,
+            Money(1, Currency.EUR),
+            LocalDateTime.of(2021, 4, 5, 23, 5),
+            location
+        )
+        val comments = listOf(
+            Comment(11, "Something", currencyTrade),
+            Comment(12, "More text", currencyTrade)
+        )
+        BDDMockito.given(commentService.findAllForCurrencyTrade(11)).willReturn(comments)
+
+        client.perform(MockMvcRequestBuilders.get("/currency-trades/11/comments/"))
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[0].text").value("Something"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$[1].text").value("More text"))
+    }
+
+    @Test
     fun `gets a comment by id`() {
         val location = Location(33, "Main", "Bankster")
         val comment = Comment(12, "Something", location)
@@ -124,6 +153,33 @@ class CommentControllerTest {
         )
             .andExpect(MockMvcResultMatchers.status().isCreated)
             .andExpect(MockMvcResultMatchers.header().string("Location", "/comments/11"))
+    }
+
+    @Test
+    fun `creates a comment for currency trade`() {
+        val location = Location(42, "Main", "Bankster")
+        val currencyTrade = CurrencyTrade(
+            11,
+            Currency.BTC,
+            Currency.EUR,
+            CurrencyTradeType.Buy,
+            Money(47000, Currency.EUR),
+            0.0023,
+            Money(1, Currency.EUR),
+            LocalDateTime.of(2021, 4, 5, 23, 5),
+            location
+        )
+        val commentDto = CommentDto(null, "Something")
+        BDDMockito.given(commentService.saveForCurrencyTrade(11, commentDto))
+            .willReturn(Comment(1, "Something", currencyTrade))
+
+        client.perform(
+            MockMvcRequestBuilders.post("/currency-trades/11/comments/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""{"text": "Something"}""")
+        )
+            .andExpect(MockMvcResultMatchers.status().isCreated)
+            .andExpect(MockMvcResultMatchers.header().string("Location", "/comments/1"))
     }
 
     @Test

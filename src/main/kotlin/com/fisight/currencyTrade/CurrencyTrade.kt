@@ -1,17 +1,11 @@
 package com.fisight.currencyTrade
 
+import com.fisight.comment.Commentable
 import com.fisight.location.Location
 import com.fisight.money.Currency
 import com.fisight.money.Money
 import java.time.LocalDateTime
-import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
-import javax.persistence.FetchType
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType
-import javax.persistence.Id
-import javax.persistence.ManyToOne
+import javax.persistence.*
 
 enum class CurrencyTradeType {
     Buy,
@@ -22,7 +16,7 @@ enum class CurrencyTradeType {
 data class CurrencyTrade(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int = 0,
+    override val id: Int = 0,
     @Enumerated(EnumType.STRING)
     val baseCurrency: Currency,
     @Enumerated(EnumType.STRING)
@@ -35,4 +29,4 @@ data class CurrencyTrade(
     val dateTraded: LocalDateTime,
     @ManyToOne(fetch = FetchType.EAGER)
     val location: Location,
-)
+) : Commentable

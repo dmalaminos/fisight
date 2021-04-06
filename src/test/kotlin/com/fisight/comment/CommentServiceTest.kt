@@ -1,5 +1,6 @@
 package com.fisight.comment
 
+import com.fisight.currencyTrade.CurrencyTradeService
 import com.fisight.location.Location
 import com.fisight.location.LocationService
 import com.fisight.money.Currency
@@ -26,9 +27,12 @@ class CommentServiceTest {
     @Mock
     private val transferService: TransferService = mock()
 
+    @Mock
+    private val currencyTradeService: CurrencyTradeService = mock()
+
     @BeforeEach
     fun setUp() {
-        commentService = CommentService(commentRepository, locationService, transferService)
+        commentService = CommentService(commentRepository, locationService, transferService, currencyTradeService)
     }
 
     @Test

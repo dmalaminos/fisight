@@ -16,6 +16,11 @@ class CommentController(private val commentService: CommentService) {
         return ResponseEntity.ok(commentService.findAllForTransfer(transferId))
     }
 
+    @GetMapping("/currency-trades/{currencyTradeId}/comments/")
+    fun getAllForCurrencyTrade(@PathVariable("currencyTradeId") currencyTradeId: Int): ResponseEntity<List<Comment>> {
+        return ResponseEntity.ok(commentService.findAllForCurrencyTrade(currencyTradeId))
+    }
+
     @GetMapping("/comments/{id}")
     fun getById(@PathVariable("id") id: Int): ResponseEntity<Comment> {
         val comment = commentService.findById(id)
@@ -40,6 +45,17 @@ class CommentController(private val commentService: CommentService) {
         @RequestBody comment: CommentDto
     ): ResponseEntity<Any> {
         val commentSaved = commentService.saveForTransfer(transferId, comment)
+        return ResponseEntity.created(
+            UriComponentsBuilder.fromPath("/comments/{id}").buildAndExpand(commentSaved.id).toUri()
+        ).build()
+    }
+
+    @PostMapping("/currency-trades/{currencyTradeId}/comments/")
+    fun saveForCurrencyTrade(
+        @PathVariable("currencyTradeId") currencyTradeId: Int,
+        @RequestBody comment: CommentDto
+    ): ResponseEntity<Any> {
+        val commentSaved = commentService.saveForCurrencyTrade(currencyTradeId, comment)
         return ResponseEntity.created(
             UriComponentsBuilder.fromPath("/comments/{id}").buildAndExpand(commentSaved.id).toUri()
         ).build()

@@ -5,16 +5,19 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.util.UriComponentsBuilder
 
 @RestController
-class CurrencyTradeController(private val currencyTradeService: CurrencyTradeService) {
+class CurrencyTradeController(
+    private val currencyTradeService: CurrencyTradeService,
+    private val mapper: CurrencyTradeMapper
+) {
     @GetMapping("/currency-trades/")
     fun getAll(): ResponseEntity<List<CurrencyTradeDto>> {
-        return ResponseEntity.ok(currencyTradeService.findAll().toList())
+        return ResponseEntity.ok(currencyTradeService.findAll().map { mapper.toDto(it) })
     }
 
     @GetMapping("/currency-trades/{id}")
     fun getById(@PathVariable("id") id: Int): ResponseEntity<CurrencyTradeDto> {
-        val currencyTrade = currencyTradeService.findById(id)
-        return currencyTrade.map { ResponseEntity.ok(it) }
+        return currencyTradeService.findById(id)
+            .map { ResponseEntity.ok(mapper.toDto(it)) }
             .orElse(ResponseEntity.badRequest().build())
     }
 

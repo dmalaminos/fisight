@@ -26,10 +26,13 @@ class CurrencyTradeControllerTest {
     @MockBean
     private lateinit var currencyTradeService: CurrencyTradeService
 
+    @MockBean
+    private lateinit var mapper: CurrencyTradeMapper
+
     @Test
     fun `gets all currency trades`() {
-        val currencyTrades = arrayOf(
-            CurrencyTradeDto(
+        val currencyTrades = listOf(
+            CurrencyTrade(
                 1,
                 Currency.EUR,
                 Currency.BTC,
@@ -40,7 +43,7 @@ class CurrencyTradeControllerTest {
                 LocalDateTime.of(2021, 3, 24, 23, 44),
                 Location(4, "MyExchange", "Bestexchange")
             ),
-            CurrencyTradeDto(
+            CurrencyTrade(
                 2,
                 Currency.EUR,
                 Currency.BTC,
@@ -52,7 +55,9 @@ class CurrencyTradeControllerTest {
                 Location(4, "MyExchange", "Bestexchange")
             )
         )
-        BDDMockito.given(currencyTradeService.findAll()).willReturn(currencyTrades.toList())
+        BDDMockito.given(currencyTradeService.findAll()).willReturn(currencyTrades)
+        BDDMockito.given(mapper.toDto(currencyTrades[0])).willCallRealMethod()
+        BDDMockito.given(mapper.toDto(currencyTrades[1])).willCallRealMethod()
 
         client.perform(MockMvcRequestBuilders.get("/currency-trades/"))
             .andExpect(MockMvcResultMatchers.status().isOk)
@@ -67,7 +72,7 @@ class CurrencyTradeControllerTest {
 
     @Test
     fun `gets a currency trade by id`() {
-        val currencyTrade = CurrencyTradeDto(
+        val currencyTrade = CurrencyTrade(
             1,
             Currency.EUR,
             Currency.BTC,
@@ -79,6 +84,7 @@ class CurrencyTradeControllerTest {
             Location(4, "MyExchange", "Bestexchange")
         )
         BDDMockito.given(currencyTradeService.findById(1)).willReturn(Optional.of(currencyTrade))
+        BDDMockito.given(mapper.toDto(currencyTrade)).willCallRealMethod()
 
         client.perform(MockMvcRequestBuilders.get("/currency-trades/1"))
             .andExpect(MockMvcResultMatchers.status().isOk)
@@ -113,8 +119,8 @@ class CurrencyTradeControllerTest {
     @Test
     fun `creates a currency trade`() {
         val location = Location(5, "Main", "Bankster")
-        val currencyTradeDto = CurrencyTradeDto(
-            null,
+        val currencyTrade = CurrencyTrade(
+            1,
             Currency.EUR,
             Currency.BTC,
             CurrencyTradeType.Buy,
@@ -122,10 +128,10 @@ class CurrencyTradeControllerTest {
             0.007,
             Money(3, Currency.EUR),
             LocalDateTime.of(2021, 3, 24, 23, 44),
-            null
+            location
         )
         BDDMockito.given(currencyTradeService.save(any(), eq(5)))
-            .willReturn(currencyTradeDto.copy(id = 1, location = location))
+            .willReturn(currencyTrade)
 
         client.perform(
             MockMvcRequestBuilders.post("/locations/5/currency-trades/")
@@ -149,7 +155,7 @@ class CurrencyTradeControllerTest {
     @Test
     fun `updates a currency trade`() {
         val location = Location(5, "Main", "Bankster")
-        val currencyTradeDto = CurrencyTradeDto(
+        val currencyTrade = CurrencyTrade(
             1,
             Currency.EUR,
             Currency.BTC,
@@ -161,7 +167,7 @@ class CurrencyTradeControllerTest {
             location
         )
         BDDMockito.given(currencyTradeService.findById(1))
-            .willReturn(Optional.of(currencyTradeDto))
+            .willReturn(Optional.of(currencyTrade))
 
         client.perform(
             MockMvcRequestBuilders.put("/locations/5/currency-trades/1")
@@ -185,7 +191,7 @@ class CurrencyTradeControllerTest {
     @Test
     fun `does not update a currency trade when URL id does not match body id`() {
         val location = Location(5, "Main", "Bankster")
-        val currencyTradeDto = CurrencyTradeDto(
+        val currencyTrade = CurrencyTrade(
             2,
             Currency.EUR,
             Currency.BTC,
@@ -197,7 +203,7 @@ class CurrencyTradeControllerTest {
             location
         )
         BDDMockito.given(currencyTradeService.findById(1))
-            .willReturn(Optional.of(currencyTradeDto))
+            .willReturn(Optional.of(currencyTrade))
 
         client.perform(
             MockMvcRequestBuilders.put("/locations/5/currency-trades/1")
