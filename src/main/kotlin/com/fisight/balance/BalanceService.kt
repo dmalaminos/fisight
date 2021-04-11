@@ -1,13 +1,13 @@
 package com.fisight.balance
 
-import com.fisight.currencyTrade.CurrencyTrade
-import com.fisight.currencyTrade.CurrencyTradeService
-import com.fisight.currencyTrade.CurrencyTradeType
 import com.fisight.location.LocationRepository
 import com.fisight.money.Money
+import com.fisight.trade.currency.CurrencyTrade
+import com.fisight.trade.currency.CurrencyTradeService
+import com.fisight.trade.currency.TradeType
 import com.fisight.transfer.TransferService
-import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import org.springframework.stereotype.Service
 
 @Service
 class BalanceService(
@@ -54,7 +54,7 @@ class BalanceService(
         atDate: LocalDateTime
     ) = currencyTradeService.findAllForLocationBeforeDate(locationId, atDate)
         .flatMap {
-            if (it.tradeType == CurrencyTradeType.Buy) {
+            if (it.tradeType == TradeType.Buy) {
                 balanceOperationsForCurrencyBuyTrade(it)
             } else {
                 balanceOperationsForCurrencySellTrade(it)

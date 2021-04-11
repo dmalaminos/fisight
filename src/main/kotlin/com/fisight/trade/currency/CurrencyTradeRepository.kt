@@ -1,8 +1,8 @@
-package com.fisight.currencyTrade
+package com.fisight.trade.currency
 
+import java.time.LocalDateTime
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
 
 @Repository
 interface CurrencyTradeRepository : CrudRepository<CurrencyTrade, Int> {

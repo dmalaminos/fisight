@@ -1,11 +1,14 @@
 package com.fisight.comment
 
-import com.fisight.currencyTrade.CurrencyTrade
-import com.fisight.currencyTrade.CurrencyTradeType
 import com.fisight.location.Location
+import com.fisight.location.LocationType
 import com.fisight.money.Currency
 import com.fisight.money.Money
+import com.fisight.trade.currency.CurrencyTrade
+import com.fisight.trade.currency.TradeType
 import com.fisight.transfer.Transfer
+import java.time.LocalDateTime
+import java.util.Optional
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,8 +18,6 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import java.time.LocalDateTime
-import java.util.*
 
 @WebMvcTest(CommentController::class)
 class CommentControllerTest {
@@ -28,7 +29,7 @@ class CommentControllerTest {
 
     @Test
     fun `gets all comments for location`() {
-        val location = Location(1, "Main", "Bankster")
+        val location = Location(1, "Main", "Bankster", LocationType.BankAccount)
         val comments = listOf(
             Comment(11, "Something", location),
             Comment(12, "More text", location),
@@ -44,8 +45,8 @@ class CommentControllerTest {
 
     @Test
     fun `gets all comments for transfer`() {
-        val sourceLocation = Location(42, "Main", "Bankster")
-        val targetLocation = Location(21, "Secondary", "NuBank")
+        val sourceLocation = Location(42, "Main", "Bankster", LocationType.BankAccount)
+        val targetLocation = Location(21, "Secondary", "NuBank", LocationType.BankAccount)
         val transfer = Transfer(
             11,
             sourceLocation,
@@ -69,12 +70,12 @@ class CommentControllerTest {
 
     @Test
     fun `gets all comments for currency trade`() {
-        val location = Location(42, "Main", "Bankster")
+        val location = Location(42, "Main", "Bankster", LocationType.BankAccount)
         val currencyTrade = CurrencyTrade(
             11,
             Currency.BTC,
             Currency.EUR,
-            CurrencyTradeType.Buy,
+            TradeType.Buy,
             Money(47000, Currency.EUR),
             0.0023,
             Money(1, Currency.EUR),
@@ -96,7 +97,7 @@ class CommentControllerTest {
 
     @Test
     fun `gets a comment by id`() {
-        val location = Location(33, "Main", "Bankster")
+        val location = Location(33, "Main", "Bankster", LocationType.BankAccount)
         val comment = Comment(12, "Something", location)
         BDDMockito.given(commentService.findById(12)).willReturn(Optional.of(comment))
 
@@ -116,7 +117,7 @@ class CommentControllerTest {
 
     @Test
     fun `creates a comment for location`() {
-        val location = Location(42, "Main", "Bankster")
+        val location = Location(42, "Main", "Bankster", LocationType.BankAccount)
         val commentDto = CommentDto(null, "Something")
         BDDMockito.given(commentService.saveForLocation(42, commentDto))
             .willReturn(Comment(11, "Something", location))
@@ -132,8 +133,8 @@ class CommentControllerTest {
 
     @Test
     fun `creates a comment for transfer`() {
-        val sourceLocation = Location(42, "Main", "Bankster")
-        val targetLocation = Location(21, "Secondary", "NuBank")
+        val sourceLocation = Location(42, "Main", "Bankster", LocationType.BankAccount)
+        val targetLocation = Location(21, "Secondary", "NuBank", LocationType.BankAccount)
         val transfer = Transfer(
             11,
             sourceLocation,
@@ -157,12 +158,12 @@ class CommentControllerTest {
 
     @Test
     fun `creates a comment for currency trade`() {
-        val location = Location(42, "Main", "Bankster")
+        val location = Location(42, "Main", "Bankster", LocationType.BankAccount)
         val currencyTrade = CurrencyTrade(
             11,
             Currency.BTC,
             Currency.EUR,
-            CurrencyTradeType.Buy,
+            TradeType.Buy,
             Money(47000, Currency.EUR),
             0.0023,
             Money(1, Currency.EUR),
@@ -184,7 +185,7 @@ class CommentControllerTest {
 
     @Test
     fun `updates a comment`() {
-        val location = Location(42, "Main", "Bankster")
+        val location = Location(42, "Main", "Bankster", LocationType.BankAccount)
         val commentDto = CommentDto(14, "Something more")
         BDDMockito.given(commentService.save(commentDto))
             .willReturn(Comment(14, "Something more", location))

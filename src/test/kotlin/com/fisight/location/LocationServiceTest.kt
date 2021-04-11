@@ -38,7 +38,7 @@ class LocationServiceTest {
 
     @Test
     fun `saves a new location`() {
-        val location = Location(0, "name", "entityName")
+        val location = Location(0, "name", "entityName", LocationType.BankAccount)
         whenever(locationRepository.save(location)).thenReturn(location.copy(id = 1))
 
         locationService.save(location)

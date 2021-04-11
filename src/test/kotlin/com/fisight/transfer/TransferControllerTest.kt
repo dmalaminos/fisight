@@ -1,8 +1,11 @@
 package com.fisight.transfer
 
 import com.fisight.location.Location
+import com.fisight.location.LocationType
 import com.fisight.money.Currency
 import com.fisight.money.Money
+import java.time.LocalDateTime
+import java.util.Optional
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.mockito.kotlin.any
@@ -14,8 +17,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultMatcher
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import java.time.LocalDateTime
-import java.util.*
 
 @WebMvcTest(TransferController::class)
 class TransferControllerTest {
@@ -33,16 +34,16 @@ class TransferControllerTest {
         val transfers = listOf(
             Transfer(
                 1,
-                Location(5, "Main", "Bankster"),
-                Location(8, "Secondary", "NuBank"),
+                Location(5, "Main", "Bankster", LocationType.BankAccount),
+                Location(8, "Secondary", "NuBank", LocationType.BankAccount),
                 Money(100, Currency.EUR),
                 Money(1, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 17, 21)
             ),
             Transfer(
                 3,
-                Location(8, "Secondary", "NuBank"),
-                Location(5, "Main", "Bankster"),
+                Location(8, "Secondary", "NuBank", LocationType.BankAccount),
+                Location(5, "Main", "Bankster", LocationType.BankAccount),
                 Money(5, Currency.EUR),
                 Money(0, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 20, 21)
@@ -75,8 +76,8 @@ class TransferControllerTest {
     fun `gets a transfer by id`() {
         val transfer = Transfer(
             21,
-            Location(5, "Main", "Bankster"),
-            Location(8, "Secondary", "NuBank"),
+            Location(5, "Main", "Bankster", LocationType.BankAccount),
+            Location(8, "Secondary", "NuBank", LocationType.BankAccount),
             Money(100, Currency.EUR),
             Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
@@ -113,8 +114,8 @@ class TransferControllerTest {
     fun `creates a transfer`() {
         val transfer = Transfer(
             22,
-            Location(5, "Main", "Bankster"),
-            Location(8, "Secondary", "NuBank"),
+            Location(5, "Main", "Bankster", LocationType.BankAccount),
+            Location(8, "Secondary", "NuBank", LocationType.BankAccount),
             Money(100, Currency.EUR),
             Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
@@ -143,8 +144,8 @@ class TransferControllerTest {
     fun `updates a transfer`() {
         val transfer = Transfer(
             22,
-            Location(5, "Main", "Bankster"),
-            Location(8, "Secondary", "NuBank"),
+            Location(5, "Main", "Bankster", LocationType.BankAccount),
+            Location(8, "Secondary", "NuBank", LocationType.BankAccount),
             Money(100, Currency.EUR),
             Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)

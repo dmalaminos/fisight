@@ -1,18 +1,23 @@
 package com.fisight.comment
 
-import com.fisight.currencyTrade.CurrencyTradeService
 import com.fisight.location.Location
 import com.fisight.location.LocationService
+import com.fisight.location.LocationType
 import com.fisight.money.Currency
 import com.fisight.money.Money
+import com.fisight.trade.currency.CurrencyTradeService
 import com.fisight.transfer.Transfer
 import com.fisight.transfer.TransferService
+import java.time.LocalDateTime
+import java.util.Optional
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
-import org.mockito.kotlin.*
-import java.time.LocalDateTime
-import java.util.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.whenever
 
 
 class CommentServiceTest {
@@ -64,7 +69,7 @@ class CommentServiceTest {
 
     @Test
     fun `saves a new comment for location`() {
-        val location = Location(42, "name", "entityName")
+        val location = Location(42, "name", "entityName", LocationType.BankAccount)
         val comment = Comment(0, "Something", location)
         val commentDto = CommentDto(null, "Something")
         whenever(locationService.findById(42)).thenReturn(Optional.of(location))
@@ -80,8 +85,8 @@ class CommentServiceTest {
 
     @Test
     fun `saves a new comment for transfer`() {
-        val sourceLocation = Location(42, "location", "entity")
-        val targetLocation = Location(21, "anotherLocation", "anotherEntity")
+        val sourceLocation = Location(42, "location", "entity", LocationType.BankAccount)
+        val targetLocation = Location(21, "anotherLocation", "anotherEntity", LocationType.BankAccount)
         val transfer = Transfer(
             11,
             sourceLocation,
@@ -106,7 +111,7 @@ class CommentServiceTest {
 
     @Test
     fun `updates existing comment`() {
-        val location = Location(42, "name", "entityName")
+        val location = Location(42, "name", "entityName", LocationType.BankAccount)
         val comment = Comment(12, "Something", location)
         val newComment = Comment(12, "Something more", location)
         val commentDto = CommentDto(12, "Something more")

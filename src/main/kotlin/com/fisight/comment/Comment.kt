@@ -1,11 +1,16 @@
 package com.fisight.comment
 
-import com.fisight.currencyTrade.CurrencyTrade
 import com.fisight.location.Location
+import com.fisight.trade.currency.CurrencyTrade
 import com.fisight.transfer.Transfer
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.JoinColumn
 import org.hibernate.annotations.AnyMetaDef
 import org.hibernate.annotations.MetaValue
-import javax.persistence.*
 import org.hibernate.annotations.Any as AnyRef
 
 @Entity

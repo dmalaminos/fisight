@@ -1,5 +1,6 @@
 package com.fisight.location
 
+import java.util.Optional
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
@@ -7,9 +8,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
-import java.util.*
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.header
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(LocationController::class)
 class LocationControllerTest {
@@ -22,8 +28,8 @@ class LocationControllerTest {
     @Test
     fun `gets all locations`() {
         val locations = arrayOf(
-            Location(1, "Main", "Bankster"),
-            Location(2, "Savings", "Altbank")
+            Location(1, "Main", "Bankster", LocationType.BankAccount),
+            Location(2, "Savings", "Altbank", LocationType.BankAccount)
         )
         given(locationService.findAll()).willReturn(locations.toList())
 
@@ -38,7 +44,7 @@ class LocationControllerTest {
 
     @Test
     fun `gets a location by id`() {
-        val location = Location(123, "Main", "Bankster")
+        val location = Location(123, "Main", "Bankster", LocationType.BankAccount)
         given(locationService.findById(123)).willReturn(Optional.of(location))
 
         client.perform(get("/locations/123"))
@@ -58,13 +64,13 @@ class LocationControllerTest {
 
     @Test
     fun `creates a location`() {
-        val location = Location(0, "Main", "Bankster")
+        val location = Location(0, "Main", "Bankster", LocationType.BankAccount)
         given(locationService.save(location)).willReturn(location.copy(id = 1))
 
         client.perform(
             post("/locations/")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"name": "Main", "entityName":"Bankster"}""")
+                .content("""{"name": "Main", "entityName":"Bankster", "type":"BankAccount"}""")
         )
             .andExpect(status().isCreated)
             .andExpect(header().string("Location", "/locations/1"))
@@ -72,21 +78,21 @@ class LocationControllerTest {
 
     @Test
     fun `updates a location`() {
-        val location = Location(123, "Main", "Bankster")
+        val location = Location(123, "Main", "Bankster", LocationType.BankAccount)
         given(locationService.findById(123)).willReturn(Optional.of(location))
         given(locationService.save(location)).willReturn(location)
 
         client.perform(
             put("/locations/123")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"id": "123", "name": "Secondary", "entityName": "Bankster"}""")
+                .content("""{"id": "123", "name": "Secondary", "entityName": "Bankster", "type":"BankAccount"}""")
         )
             .andExpect(status().isOk)
     }
 
     @Test
     fun `does not update a location when URL id does not match body id`() {
-        val location = Location(123, "Main", "Bankster")
+        val location = Location(123, "Main", "Bankster", LocationType.BankAccount)
         given(locationService.findById(123)).willReturn(Optional.of(location))
 
         client.perform(

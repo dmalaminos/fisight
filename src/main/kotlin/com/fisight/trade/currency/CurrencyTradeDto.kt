@@ -1,4 +1,4 @@
-package com.fisight.currencyTrade
+package com.fisight.trade.currency
 
 import com.fisight.location.Location
 import com.fisight.money.Currency
@@ -9,7 +9,7 @@ data class CurrencyTradeDto(
     val id: Int?,
     val baseCurrency: Currency,
     val quoteCurrency: Currency,
-    val tradeType: CurrencyTradeType,
+    val tradeType: TradeType,
     val pricePerBaseUnit: Money,
     val quantity: Double,
     val fee: Money,

@@ -1,9 +1,12 @@
-package com.fisight.currencyTrade
+package com.fisight.trade.currency
 
 import com.fisight.location.Location
 import com.fisight.location.LocationRepository
+import com.fisight.location.LocationType
 import com.fisight.money.Currency
 import com.fisight.money.Money
+import java.time.LocalDateTime
+import java.util.Optional
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -13,8 +16,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
-import java.time.LocalDateTime
-import java.util.*
 
 class CurrencyTradeServiceTest {
     private lateinit var currencyTradeService: CurrencyTradeService
@@ -40,23 +41,23 @@ class CurrencyTradeServiceTest {
                 1,
                 Currency.EUR,
                 Currency.BTC,
-                CurrencyTradeType.Buy,
+                TradeType.Buy,
                 Money(1000, Currency.EUR),
                 0.007,
                 Money(3, Currency.EUR),
                 LocalDateTime.of(2021, 3, 24, 23, 44),
-                Location(4, "MyExchange", "Bestexchange")
+                Location(4, "MyExchange", "Bestexchange", LocationType.BankAccount)
             ),
             CurrencyTrade(
                 2,
                 Currency.EUR,
                 Currency.BTC,
-                CurrencyTradeType.Sell,
+                TradeType.Sell,
                 Money(200, Currency.EUR),
                 0.007,
                 Money(3, Currency.EUR),
                 LocalDateTime.of(2021, 3, 24, 23, 50),
-                Location(4, "MyExchange", "Bestexchange")
+                Location(4, "MyExchange", "Bestexchange", LocationType.BankAccount)
             )
         )
 
@@ -73,12 +74,12 @@ class CurrencyTradeServiceTest {
             3,
             Currency.EUR,
             Currency.BTC,
-            CurrencyTradeType.Buy,
+            TradeType.Buy,
             Money(1000, Currency.EUR),
             0.007,
             Money(3, Currency.EUR),
             LocalDateTime.of(2021, 3, 24, 23, 44),
-            Location(4, "MyExchange", "Bestexchange")
+            Location(4, "MyExchange", "Bestexchange", LocationType.BankAccount)
         )
 
         whenever(currencyTradeRepository.findById(3)).thenReturn(Optional.of(currencyTrade))
@@ -105,7 +106,7 @@ class CurrencyTradeServiceTest {
             null,
             Currency.EUR,
             Currency.BTC,
-            CurrencyTradeType.Buy,
+            TradeType.Buy,
             Money(1000, Currency.EUR),
             0.007,
             Money(3, Currency.EUR),
@@ -113,12 +114,12 @@ class CurrencyTradeServiceTest {
             null
         )
 
-        val location = Location(4, "MyExchange", "Bestexchange")
+        val location = Location(4, "MyExchange", "Bestexchange", LocationType.BankAccount)
         val currencyTrade = CurrencyTrade(
             0,
             Currency.EUR,
             Currency.BTC,
-            CurrencyTradeType.Buy,
+            TradeType.Buy,
             Money(1000, Currency.EUR),
             0.007,
             Money(3, Currency.EUR),
@@ -144,7 +145,7 @@ class CurrencyTradeServiceTest {
             null,
             Currency.EUR,
             Currency.BTC,
-            CurrencyTradeType.Buy,
+            TradeType.Buy,
             Money(1000, Currency.EUR),
             0.007,
             Money(3, Currency.EUR),

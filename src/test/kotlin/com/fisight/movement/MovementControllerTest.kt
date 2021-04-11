@@ -1,8 +1,11 @@
 package com.fisight.movement
 
 import com.fisight.location.Location
+import com.fisight.location.LocationType
 import com.fisight.money.Currency
 import com.fisight.money.Money
+import java.time.LocalDateTime
+import java.util.Optional
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,8 +16,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultMatcher
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import java.time.LocalDateTime
-import java.util.*
 
 @WebMvcTest(MovementController::class)
 class MovementControllerTest {
@@ -29,7 +30,7 @@ class MovementControllerTest {
 
     @Test
     fun `gets all movements for location`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val movements = listOf(
             Movement(
                 1,
@@ -71,7 +72,7 @@ class MovementControllerTest {
 
     @Test
     fun `gets a movement by id`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val movement = Movement(
             12,
             Money(300, Currency.EUR),
@@ -109,7 +110,7 @@ class MovementControllerTest {
 
     @Test
     fun `creates a movement`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val movement = Movement(
             2,
             Money(300, Currency.EUR),
@@ -148,7 +149,7 @@ class MovementControllerTest {
 
     @Test
     fun `updates a movement`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val movement = Movement(
             12,
             Money(300, Currency.EUR),

@@ -2,8 +2,11 @@ package com.fisight.transfer
 
 import com.fisight.location.Location
 import com.fisight.location.LocationRepository
+import com.fisight.location.LocationType
 import com.fisight.money.Currency
 import com.fisight.money.Money
+import java.time.LocalDateTime
+import java.util.Optional
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -13,8 +16,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
-import java.time.LocalDateTime
-import java.util.*
 
 class TransferServiceTest {
     private lateinit var transferService: TransferService
@@ -38,16 +39,16 @@ class TransferServiceTest {
         val transfers = listOf(
             Transfer(
                 1,
-                Location(5, "Primary bank", "Bankster"),
-                Location(8, "Secondary bank", "NuBank"),
+                Location(5, "Primary bank", "Bankster", LocationType.BankAccount),
+                Location(8, "Secondary bank", "NuBank", LocationType.BankAccount),
                 Money(100, Currency.EUR),
                 Money(1, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 17, 21)
             ),
             Transfer(
                 3,
-                Location(8, "Secondary bank", "NuBank"),
-                Location(5, "Primary bank", "Bankster"),
+                Location(8, "Secondary bank", "NuBank", LocationType.BankAccount),
+                Location(5, "Primary bank", "Bankster", LocationType.BankAccount),
                 Money(5, Currency.EUR),
                 Money(0, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 20, 21)
@@ -67,16 +68,16 @@ class TransferServiceTest {
         val transfers = listOf(
             Transfer(
                 2,
-                Location(8, "Secondary bank", "NuBank"),
-                Location(5, "Primary bank", "Bankster"),
+                Location(8, "Secondary bank", "NuBank", LocationType.BankAccount),
+                Location(5, "Primary bank", "Bankster", LocationType.BankAccount),
                 Money(200, Currency.EUR),
                 Money(2, Currency.EUR),
                 LocalDateTime.of(2021, 2, 26, 12, 38)
             ),
             Transfer(
                 3,
-                Location(8, "Secondary bank", "NuBank"),
-                Location(5, "Primary bank", "Bankster"),
+                Location(8, "Secondary bank", "NuBank", LocationType.BankAccount),
+                Location(5, "Primary bank", "Bankster", LocationType.BankAccount),
                 Money(5, Currency.EUR),
                 Money(0, Currency.EUR),
                 LocalDateTime.of(2021, 4, 2, 20, 21)
@@ -94,8 +95,8 @@ class TransferServiceTest {
     fun `gets a single transfer by id`() {
         val transfer = Transfer(
             1,
-            Location(5, "Primary bank", "Bankster"),
-            Location(8, "Secondary bank", "NuBank"),
+            Location(5, "Primary bank", "Bankster", LocationType.BankAccount),
+            Location(8, "Secondary bank", "NuBank", LocationType.BankAccount),
             Money(100, Currency.EUR),
             Money(1, Currency.EUR),
             LocalDateTime.of(2021, 4, 2, 17, 21)
@@ -130,8 +131,8 @@ class TransferServiceTest {
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
 
-        val sourceLocation = Location(5, "Primary bank", "Bankster")
-        val targetLocation = Location(8, "Secondary bank", "NuBank")
+        val sourceLocation = Location(5, "Primary bank", "Bankster", LocationType.BankAccount)
+        val targetLocation = Location(8, "Secondary bank", "NuBank", LocationType.BankAccount)
         val transfer = Transfer(
             0,
             sourceLocation,
@@ -166,7 +167,7 @@ class TransferServiceTest {
             LocalDateTime.of(2021, 4, 2, 17, 21)
         )
 
-        val sourceLocation = Location(5, "Primary bank", "Bankster")
+        val sourceLocation = Location(5, "Primary bank", "Bankster", LocationType.BankAccount)
         whenever(locationRepository.findById(5)).thenReturn(Optional.of(sourceLocation))
         whenever(locationRepository.findById(88)).thenReturn(Optional.empty())
 

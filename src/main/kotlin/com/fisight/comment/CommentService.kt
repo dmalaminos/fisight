@@ -1,11 +1,11 @@
 package com.fisight.comment
 
-import com.fisight.currencyTrade.CurrencyTradeService
 import com.fisight.location.Location
 import com.fisight.location.LocationService
+import com.fisight.trade.currency.CurrencyTradeService
 import com.fisight.transfer.TransferService
+import java.util.Optional
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class CommentService(

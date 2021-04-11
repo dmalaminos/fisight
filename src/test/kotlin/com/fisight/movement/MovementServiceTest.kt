@@ -2,8 +2,11 @@ package com.fisight.movement
 
 import com.fisight.location.Location
 import com.fisight.location.LocationRepository
+import com.fisight.location.LocationType
 import com.fisight.money.Currency
 import com.fisight.money.Money
+import java.time.LocalDateTime
+import java.util.Optional
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
@@ -13,8 +16,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
-import java.time.LocalDateTime
-import java.util.*
 
 
 class MovementServiceTest {
@@ -36,7 +37,7 @@ class MovementServiceTest {
 
     @Test
     fun `gets all movements by location`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val movements = listOf(
             Movement(
                 1,
@@ -66,7 +67,7 @@ class MovementServiceTest {
 
     @Test
     fun `gets a single movement by id`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val movement = Movement(
             12,
             Money(300, Currency.EUR),
@@ -96,7 +97,7 @@ class MovementServiceTest {
 
     @Test
     fun `saves a new transfer`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val movement = Movement(
             0,
             Money(300, Currency.EUR),
@@ -128,7 +129,7 @@ class MovementServiceTest {
 
     @Test
     fun `cannot save a new movement when location does not exist`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val movementDto = MovementDto(
             null,
             Money(300, Currency.EUR),
@@ -150,7 +151,7 @@ class MovementServiceTest {
 
     @Test
     fun `updates an existing transfer`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val movement = Movement(
             12,
             Money(10, Currency.EUR),

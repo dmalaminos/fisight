@@ -1,8 +1,11 @@
-package com.fisight.currencyTrade
+package com.fisight.trade.currency
 
 import com.fisight.location.Location
+import com.fisight.location.LocationType
 import com.fisight.money.Currency
 import com.fisight.money.Money
+import java.time.LocalDateTime
+import java.util.Optional
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.mockito.kotlin.any
@@ -15,8 +18,6 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultMatcher.matchAll
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import java.time.LocalDateTime
-import java.util.*
 
 @WebMvcTest(CurrencyTradeController::class)
 class CurrencyTradeControllerTest {
@@ -36,23 +37,23 @@ class CurrencyTradeControllerTest {
                 1,
                 Currency.EUR,
                 Currency.BTC,
-                CurrencyTradeType.Buy,
+                TradeType.Buy,
                 Money(1000, Currency.EUR),
                 0.007,
                 Money(3, Currency.EUR),
                 LocalDateTime.of(2021, 3, 24, 23, 44),
-                Location(4, "MyExchange", "Bestexchange")
+                Location(4, "MyExchange", "Bestexchange", LocationType.BankAccount)
             ),
             CurrencyTrade(
                 2,
                 Currency.EUR,
                 Currency.BTC,
-                CurrencyTradeType.Buy,
+                TradeType.Buy,
                 Money(200, Currency.EUR),
                 0.007,
                 Money(3, Currency.EUR),
                 LocalDateTime.of(2021, 3, 24, 23, 50),
-                Location(4, "MyExchange", "Bestexchange")
+                Location(4, "MyExchange", "Bestexchange", LocationType.BankAccount)
             )
         )
         BDDMockito.given(currencyTradeService.findAll()).willReturn(currencyTrades)
@@ -76,12 +77,12 @@ class CurrencyTradeControllerTest {
             1,
             Currency.EUR,
             Currency.BTC,
-            CurrencyTradeType.Buy,
+            TradeType.Buy,
             Money(1000, Currency.EUR),
             0.007,
             Money(3, Currency.EUR),
             LocalDateTime.of(2021, 3, 24, 23, 44),
-            Location(4, "MyExchange", "Bestexchange")
+            Location(4, "MyExchange", "Bestexchange", LocationType.BankAccount)
         )
         BDDMockito.given(currencyTradeService.findById(1)).willReturn(Optional.of(currencyTrade))
         BDDMockito.given(mapper.toDto(currencyTrade)).willCallRealMethod()
@@ -118,12 +119,12 @@ class CurrencyTradeControllerTest {
 
     @Test
     fun `creates a currency trade`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val currencyTrade = CurrencyTrade(
             1,
             Currency.EUR,
             Currency.BTC,
-            CurrencyTradeType.Buy,
+            TradeType.Buy,
             Money(1000, Currency.EUR),
             0.007,
             Money(3, Currency.EUR),
@@ -154,12 +155,12 @@ class CurrencyTradeControllerTest {
 
     @Test
     fun `updates a currency trade`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val currencyTrade = CurrencyTrade(
             1,
             Currency.EUR,
             Currency.BTC,
-            CurrencyTradeType.Buy,
+            TradeType.Buy,
             Money(1000, Currency.EUR),
             0.007,
             Money(3, Currency.EUR),
@@ -190,12 +191,12 @@ class CurrencyTradeControllerTest {
 
     @Test
     fun `does not update a currency trade when URL id does not match body id`() {
-        val location = Location(5, "Main", "Bankster")
+        val location = Location(5, "Main", "Bankster", LocationType.BankAccount)
         val currencyTrade = CurrencyTrade(
             2,
             Currency.EUR,
             Currency.BTC,
-            CurrencyTradeType.Buy,
+            TradeType.Buy,
             Money(1000, Currency.EUR),
             0.007,
             Money(3, Currency.EUR),

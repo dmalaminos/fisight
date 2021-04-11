@@ -1,4 +1,4 @@
-package com.fisight.currencyTrade
+package com.fisight.trade.currency
 
 import com.fisight.location.Location
 import org.springframework.stereotype.Component

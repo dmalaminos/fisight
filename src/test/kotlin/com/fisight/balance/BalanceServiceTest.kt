@@ -1,14 +1,17 @@
 package com.fisight.balance
 
-import com.fisight.currencyTrade.CurrencyTrade
-import com.fisight.currencyTrade.CurrencyTradeService
-import com.fisight.currencyTrade.CurrencyTradeType
 import com.fisight.location.Location
 import com.fisight.location.LocationRepository
+import com.fisight.location.LocationType
 import com.fisight.money.Currency
 import com.fisight.money.Money
+import com.fisight.trade.currency.CurrencyTrade
+import com.fisight.trade.currency.CurrencyTradeService
+import com.fisight.trade.currency.TradeType
 import com.fisight.transfer.Transfer
 import com.fisight.transfer.TransferService
+import java.time.LocalDateTime
+import java.util.Optional
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -17,8 +20,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import java.time.LocalDateTime
-import java.util.*
 
 
 class BalanceServiceTest {
@@ -46,8 +47,8 @@ class BalanceServiceTest {
     @Test
     fun `calculates balance for location with transfers`() {
         val atDate = LocalDateTime.of(2021, 4, 2, 23, 44)
-        val location21 = Location(21, "Another", "NuBank")
-        val location42 = Location(42, "Main", "Bankster")
+        val location21 = Location(21, "Another", "NuBank", LocationType.BankAccount)
+        val location42 = Location(42, "Main", "Bankster", LocationType.BankAccount)
         val transfers = listOf(
             Transfer(
                 1,
@@ -92,7 +93,7 @@ class BalanceServiceTest {
     @Test
     fun `calculates balance for location with no capital`() {
         val atDate = LocalDateTime.of(2021, 4, 2, 23, 44)
-        val location42 = Location(42, "Main", "Bankster")
+        val location42 = Location(42, "Main", "Bankster", LocationType.BankAccount)
         whenever(locationRepository.findById(42)).thenReturn(Optional.of(location42))
         whenever(transferService.findAllForLocationBeforeDate(42, atDate)).thenReturn(emptyList())
 
@@ -111,8 +112,8 @@ class BalanceServiceTest {
     @Test
     fun `calculates balance for location with transfer and currency trades`() {
         val atDate = LocalDateTime.of(2021, 4, 2, 23, 44)
-        val location21 = Location(21, "Another", "NuBank")
-        val location42 = Location(42, "Main", "Bankster")
+        val location21 = Location(21, "Another", "NuBank", LocationType.BankAccount)
+        val location42 = Location(42, "Main", "Bankster", LocationType.BankAccount)
         val transfers = listOf(
             Transfer(
                 1,
@@ -128,7 +129,7 @@ class BalanceServiceTest {
                 1,
                 Currency.BTC,
                 Currency.EUR,
-                CurrencyTradeType.Buy,
+                TradeType.Buy,
                 Money(38409.48, Currency.EUR),
                 0.000355,
                 Money.zero(Currency.BTC),
@@ -139,7 +140,7 @@ class BalanceServiceTest {
                 2,
                 Currency.BTC,
                 Currency.EUR,
-                CurrencyTradeType.Sell,
+                TradeType.Sell,
                 Money(40000, Currency.EUR),
                 0.0002,
                 Money.zero(Currency.BTC),

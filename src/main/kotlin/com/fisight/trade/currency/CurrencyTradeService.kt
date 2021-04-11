@@ -1,9 +1,9 @@
-package com.fisight.currencyTrade
+package com.fisight.trade.currency
 
 import com.fisight.location.LocationRepository
-import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Optional
+import org.springframework.stereotype.Service
 
 @Service
 class CurrencyTradeService(
