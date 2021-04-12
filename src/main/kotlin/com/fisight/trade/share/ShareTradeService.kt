@@ -22,8 +22,8 @@ class ShareTradeService(
         return shareTradeRepository.findByLocationId(locationId)
     }
 
-    fun save(currencyTradeDto: ShareTradeDto, locationId: Int): ShareTrade {
-        val location = locationRepository.findById(locationId)
+    fun save(currencyTradeDto: ShareTradeDto): ShareTrade {
+        val location = locationRepository.findById(currencyTradeDto.locationId)
         if (location.isPresent) {
             val currencyTrade = mapper.toEntity(currencyTradeDto, location.get())
             return shareTradeRepository.save(currencyTrade)

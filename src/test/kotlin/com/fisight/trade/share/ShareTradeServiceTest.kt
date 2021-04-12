@@ -154,7 +154,7 @@ class ShareTradeServiceTest {
         whenever(shareTradeRepository.save(shareTrade)).thenReturn(shareTrade.copy(id = 1))
 
 
-        val actual = shareTradeService.save(shareTradeDto, 4)
+        val actual = shareTradeService.save(shareTradeDto)
 
         verify(locationRepository).findById(location.id)
         verify(shareTradeRepository).save(shareTrade)
@@ -182,7 +182,7 @@ class ShareTradeServiceTest {
         whenever(locationRepository.findById(5)).thenReturn(Optional.empty())
 
         assertThrows(IllegalArgumentException::class.java) {
-            shareTradeService.save(shareTradeDto, 5)
+            shareTradeService.save(shareTradeDto)
         }
 
         verify(locationRepository).findById(5)

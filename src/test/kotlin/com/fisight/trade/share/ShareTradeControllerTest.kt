@@ -192,11 +192,11 @@ class ShareTradeControllerTest {
             LocalDateTime.of(2021, 4, 11, 22, 16),
             location.id
         )
-        BDDMockito.given(shareTradeService.save(shareTradeDto, 5))
+        BDDMockito.given(shareTradeService.save(shareTradeDto))
             .willReturn(shareTrade)
 
         client.perform(
-            MockMvcRequestBuilders.post("/locations/5/share-trades/")
+            MockMvcRequestBuilders.post("/share-trades/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -241,7 +241,7 @@ class ShareTradeControllerTest {
             .willReturn(Optional.of(shareTrade))
 
         client.perform(
-            MockMvcRequestBuilders.put("/locations/5/share-trades/1")
+            MockMvcRequestBuilders.put("/share-trades/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -286,7 +286,7 @@ class ShareTradeControllerTest {
             .willReturn(Optional.of(shareTrade))
 
         client.perform(
-            MockMvcRequestBuilders.put("/locations/5/share-trades/1")
+            MockMvcRequestBuilders.put("/share-trades/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -314,5 +314,4 @@ class ShareTradeControllerTest {
         client.perform(MockMvcRequestBuilders.delete("/share-trades/1234"))
             .andExpect(MockMvcResultMatchers.status().isOk)
     }
-
 }

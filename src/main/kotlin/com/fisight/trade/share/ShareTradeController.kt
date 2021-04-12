@@ -27,25 +27,23 @@ class ShareTradeController(
             .orElse(ResponseEntity.badRequest().build())
     }
 
-    @PostMapping("/locations/{locationId}/share-trades/")
+    @PostMapping("/share-trades/")
     fun save(
-        @PathVariable("locationId") locationId: Int,
-        @RequestBody shareTrade: ShareTradeDto
+        @RequestBody shareTradeDto: ShareTradeDto
     ): ResponseEntity<Any> {
-        val (shareTradeId) = shareTradeService.save(shareTrade, locationId)
+        val (shareTradeId) = shareTradeService.save(shareTradeDto)
         return ResponseEntity.created(
             UriComponentsBuilder.fromPath("/share-trades/{shareTradeId}").buildAndExpand(shareTradeId).toUri()
         ).build()
     }
 
-    @PutMapping("/locations/{locationId}/share-trades/{id}")
+    @PutMapping("/share-trades/{id}")
     fun update(
         @PathVariable("id") id: Int,
-        @PathVariable("locationId") locationId: Int,
         @RequestBody shareTradeDto: ShareTradeDto
     ): ResponseEntity<Any> {
         if (shareTradeDto.id == id) {
-            shareTradeService.save(shareTradeDto, locationId)
+            shareTradeService.save(shareTradeDto)
             return ResponseEntity.ok().build()
         }
         return ResponseEntity.badRequest().build()
