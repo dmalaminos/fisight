@@ -59,7 +59,7 @@ class CurrencyTradeControllerTest {
         BDDMockito.given(mapper.toDto(currencyTrades[0])).willCallRealMethod()
         BDDMockito.given(mapper.toDto(currencyTrades[1])).willCallRealMethod()
 
-        client.perform(MockMvcRequestBuilders.get("/currency-trades/"))
+        client.perform(MockMvcRequestBuilders.get("/trades/currency/"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(
@@ -95,7 +95,7 @@ class CurrencyTradeControllerTest {
         BDDMockito.given(currencyTradeService.findById(1)).willReturn(Optional.of(currencyTrade))
         BDDMockito.given(mapper.toDto(currencyTrade)).willCallRealMethod()
 
-        client.perform(MockMvcRequestBuilders.get("/currency-trades/1"))
+        client.perform(MockMvcRequestBuilders.get("/trades/currency/1"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(
@@ -119,7 +119,7 @@ class CurrencyTradeControllerTest {
     fun `cannot get a currency trade by id when id does not exist`() {
         BDDMockito.given(currencyTradeService.findById(1)).willReturn(Optional.empty())
 
-        client.perform(MockMvcRequestBuilders.get("/currency-trades/1"))
+        client.perform(MockMvcRequestBuilders.get("/trades/currency/1"))
             .andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
@@ -141,7 +141,7 @@ class CurrencyTradeControllerTest {
             .willReturn(currencyTrade)
 
         client.perform(
-            MockMvcRequestBuilders.post("/currency-trades/")
+            MockMvcRequestBuilders.post("/trades/currency/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -157,7 +157,7 @@ class CurrencyTradeControllerTest {
                 )
         )
             .andExpect(MockMvcResultMatchers.status().isCreated)
-            .andExpect(MockMvcResultMatchers.header().string("Location", "/currency-trades/1"))
+            .andExpect(MockMvcResultMatchers.header().string("Location", "/trades/currency/1"))
     }
 
     @Test
@@ -178,7 +178,7 @@ class CurrencyTradeControllerTest {
             .willReturn(Optional.of(currencyTrade))
 
         client.perform(
-            MockMvcRequestBuilders.put("/currency-trades/1")
+            MockMvcRequestBuilders.put("/trades/currency/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -214,7 +214,7 @@ class CurrencyTradeControllerTest {
             .willReturn(Optional.of(currencyTrade))
 
         client.perform(
-            MockMvcRequestBuilders.put("/currency-trades/1")
+            MockMvcRequestBuilders.put("/trades/currency/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -234,7 +234,7 @@ class CurrencyTradeControllerTest {
 
     @Test
     fun `deletes a currency trade`() {
-        client.perform(MockMvcRequestBuilders.delete("/currency-trades/1234"))
+        client.perform(MockMvcRequestBuilders.delete("/trades/currency/1234"))
             .andExpect(MockMvcResultMatchers.status().isOk)
     }
 

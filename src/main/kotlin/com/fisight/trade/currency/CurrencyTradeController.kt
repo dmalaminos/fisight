@@ -15,27 +15,27 @@ class CurrencyTradeController(
     private val currencyTradeService: CurrencyTradeService,
     private val mapper: CurrencyTradeMapper
 ) {
-    @GetMapping("/currency-trades/")
+    @GetMapping("/trades/currency/")
     fun getAll(): ResponseEntity<List<CurrencyTradeDto>> {
         return ResponseEntity.ok(currencyTradeService.findAll().map { mapper.toDto(it) })
     }
 
-    @GetMapping("/currency-trades/{id}")
+    @GetMapping("/trades/currency/{id}")
     fun getById(@PathVariable("id") id: Int): ResponseEntity<CurrencyTradeDto> {
         return currencyTradeService.findById(id)
             .map { ResponseEntity.ok(mapper.toDto(it)) }
             .orElse(ResponseEntity.badRequest().build())
     }
 
-    @PostMapping("/currency-trades/")
+    @PostMapping("/trades/currency/")
     fun save(@RequestBody currencyTradeDto: CurrencyTradeDto): ResponseEntity<Any> {
         val (currencyTradeId) = currencyTradeService.save(currencyTradeDto)
         return ResponseEntity.created(
-            UriComponentsBuilder.fromPath("/currency-trades/{currencyTradeId}").buildAndExpand(currencyTradeId).toUri()
+            UriComponentsBuilder.fromPath("/trades/currency/{currencyTradeId}").buildAndExpand(currencyTradeId).toUri()
         ).build()
     }
 
-    @PutMapping("/currency-trades/{id}")
+    @PutMapping("/trades/currency/{id}")
     fun update(
         @PathVariable("id") id: Int,
         @RequestBody currencyTradeDto: CurrencyTradeDto
@@ -47,7 +47,7 @@ class CurrencyTradeController(
         return ResponseEntity.badRequest().build()
     }
 
-    @DeleteMapping("/currency-trades/{id}")
+    @DeleteMapping("/trades/currency/{id}")
     fun delete(@PathVariable("id") id: Int): ResponseEntity<Any> {
         currencyTradeService.deleteById(id)
         return ResponseEntity.ok().build()

@@ -88,7 +88,7 @@ class CommentControllerTest {
         )
         BDDMockito.given(commentService.findAllForCurrencyTrade(11)).willReturn(comments)
 
-        client.perform(MockMvcRequestBuilders.get("/currency-trades/11/comments/"))
+        client.perform(MockMvcRequestBuilders.get("/trades/currency/11/comments/"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].text").value("Something"))
@@ -175,7 +175,7 @@ class CommentControllerTest {
             .willReturn(Comment(1, "Something", currencyTrade))
 
         client.perform(
-            MockMvcRequestBuilders.post("/currency-trades/11/comments/")
+            MockMvcRequestBuilders.post("/trades/currency/11/comments/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""{"text": "Something"}""")
         )

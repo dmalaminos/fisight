@@ -16,7 +16,7 @@ class CommentController(private val commentService: CommentService) {
         return ResponseEntity.ok(commentService.findAllForTransfer(transferId))
     }
 
-    @GetMapping("/currency-trades/{currencyTradeId}/comments/")
+    @GetMapping("/trades/currency/{currencyTradeId}/comments/")
     fun getAllForCurrencyTrade(@PathVariable("currencyTradeId") currencyTradeId: Int): ResponseEntity<List<Comment>> {
         return ResponseEntity.ok(commentService.findAllForCurrencyTrade(currencyTradeId))
     }
@@ -50,7 +50,7 @@ class CommentController(private val commentService: CommentService) {
         ).build()
     }
 
-    @PostMapping("/currency-trades/{currencyTradeId}/comments/")
+    @PostMapping("/trades/currency/{currencyTradeId}/comments/")
     fun saveForCurrencyTrade(
         @PathVariable("currencyTradeId") currencyTradeId: Int,
         @RequestBody comment: CommentDto

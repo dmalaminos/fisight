@@ -15,29 +15,29 @@ class ShareTradeController(
     private val shareTradeService: ShareTradeService,
     private val mapper: ShareTradeMapper
 ) {
-    @GetMapping("/share-trades/")
+    @GetMapping("/trades/share/")
     fun getAll(): ResponseEntity<List<ShareTradeDto>> {
         return ResponseEntity.ok(shareTradeService.findAll().map { mapper.toDto(it) })
     }
 
-    @GetMapping("/share-trades/{id}")
+    @GetMapping("/trades/share/{id}")
     fun getById(@PathVariable("id") id: Int): ResponseEntity<ShareTradeDto> {
         return shareTradeService.findById(id)
             .map { ResponseEntity.ok(mapper.toDto(it)) }
             .orElse(ResponseEntity.badRequest().build())
     }
 
-    @PostMapping("/share-trades/")
+    @PostMapping("/trades/share/")
     fun save(
         @RequestBody shareTradeDto: ShareTradeDto
     ): ResponseEntity<Any> {
         val (shareTradeId) = shareTradeService.save(shareTradeDto)
         return ResponseEntity.created(
-            UriComponentsBuilder.fromPath("/share-trades/{shareTradeId}").buildAndExpand(shareTradeId).toUri()
+            UriComponentsBuilder.fromPath("/trades/share/{shareTradeId}").buildAndExpand(shareTradeId).toUri()
         ).build()
     }
 
-    @PutMapping("/share-trades/{id}")
+    @PutMapping("/trades/share/{id}")
     fun update(
         @PathVariable("id") id: Int,
         @RequestBody shareTradeDto: ShareTradeDto
@@ -49,7 +49,7 @@ class ShareTradeController(
         return ResponseEntity.badRequest().build()
     }
 
-    @DeleteMapping("/share-trades/{id}")
+    @DeleteMapping("/trades/share/{id}")
     fun delete(@PathVariable("id") id: Int): ResponseEntity<Any> {
         shareTradeService.deleteById(id)
         return ResponseEntity.ok().build()

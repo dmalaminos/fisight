@@ -68,7 +68,7 @@ class ShareTradeControllerTest {
         BDDMockito.given(mapper.toDto(shareTrades[0])).willCallRealMethod()
         BDDMockito.given(mapper.toDto(shareTrades[1])).willCallRealMethod()
 
-        client.perform(MockMvcRequestBuilders.get("/share-trades/"))
+        client.perform(MockMvcRequestBuilders.get("/trades/share/"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(
@@ -127,7 +127,7 @@ class ShareTradeControllerTest {
         BDDMockito.given(shareTradeService.findById(1)).willReturn(Optional.of(shareTrade))
         BDDMockito.given(mapper.toDto(shareTrade)).willCallRealMethod()
 
-        client.perform(MockMvcRequestBuilders.get("/share-trades/1"))
+        client.perform(MockMvcRequestBuilders.get("/trades/share/1"))
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(
@@ -155,7 +155,7 @@ class ShareTradeControllerTest {
     fun `cannot get a share trade by id when id does not exist`() {
         BDDMockito.given(shareTradeService.findById(1)).willReturn(Optional.empty())
 
-        client.perform(MockMvcRequestBuilders.get("/share-trades/1"))
+        client.perform(MockMvcRequestBuilders.get("/trades/share/1"))
             .andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
@@ -196,7 +196,7 @@ class ShareTradeControllerTest {
             .willReturn(shareTrade)
 
         client.perform(
-            MockMvcRequestBuilders.post("/share-trades/")
+            MockMvcRequestBuilders.post("/trades/share/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -216,7 +216,7 @@ class ShareTradeControllerTest {
                 )
         )
             .andExpect(MockMvcResultMatchers.status().isCreated)
-            .andExpect(MockMvcResultMatchers.header().string("Location", "/share-trades/1"))
+            .andExpect(MockMvcResultMatchers.header().string("Location", "/trades/share/1"))
     }
 
     @Test
@@ -241,7 +241,7 @@ class ShareTradeControllerTest {
             .willReturn(Optional.of(shareTrade))
 
         client.perform(
-            MockMvcRequestBuilders.put("/share-trades/1")
+            MockMvcRequestBuilders.put("/trades/share/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -286,7 +286,7 @@ class ShareTradeControllerTest {
             .willReturn(Optional.of(shareTrade))
 
         client.perform(
-            MockMvcRequestBuilders.put("/share-trades/1")
+            MockMvcRequestBuilders.put("/trades/share/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -311,7 +311,7 @@ class ShareTradeControllerTest {
 
     @Test
     fun `deletes a share trade`() {
-        client.perform(MockMvcRequestBuilders.delete("/share-trades/1234"))
+        client.perform(MockMvcRequestBuilders.delete("/trades/share/1234"))
             .andExpect(MockMvcResultMatchers.status().isOk)
     }
 }
