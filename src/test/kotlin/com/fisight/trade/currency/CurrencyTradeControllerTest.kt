@@ -8,8 +8,7 @@ import java.time.LocalDateTime
 import java.util.Optional
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
-import org.mockito.kotlin.any
-import org.mockito.kotlin.eq
+import org.mockito.kotlin.argWhere
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -64,9 +63,18 @@ class CurrencyTradeControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk)
             .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(
-                matchCurrencyTrade(
-                    1, "EUR", "BTC", "Buy", 1000, "EUR", "0.007",
-                    3, "EUR", "2021-03-24T23:44:00", 4, "MyExchange", "Bestexchange"
+                matchAll(
+                    MockMvcResultMatchers.jsonPath("$[0].id").value(1),
+                    MockMvcResultMatchers.jsonPath("$[0].baseCurrency").value("EUR"),
+                    MockMvcResultMatchers.jsonPath("$[0].quoteCurrency").value("BTC"),
+                    MockMvcResultMatchers.jsonPath("$[0].tradeType").value("Buy"),
+                    MockMvcResultMatchers.jsonPath("$[0].pricePerBaseUnit.amount").value(1000),
+                    MockMvcResultMatchers.jsonPath("$[0].pricePerBaseUnit.currency").value("EUR"),
+                    MockMvcResultMatchers.jsonPath("$[0].quantity").value("0.007"),
+                    MockMvcResultMatchers.jsonPath("$[0].fee.amount").value(3),
+                    MockMvcResultMatchers.jsonPath("$[0].fee.currency").value("EUR"),
+                    MockMvcResultMatchers.jsonPath("$[0].dateTraded").value("2021-03-24T23:44:00"),
+                    MockMvcResultMatchers.jsonPath("$[0].locationId").value(4)
                 )
             )
     }
@@ -102,9 +110,7 @@ class CurrencyTradeControllerTest {
                     MockMvcResultMatchers.jsonPath("$.fee.amount").value(3),
                     MockMvcResultMatchers.jsonPath("$.fee.currency").value("EUR"),
                     MockMvcResultMatchers.jsonPath("$.dateTraded").value("2021-03-24T23:44:00"),
-                    MockMvcResultMatchers.jsonPath("$.location.id").value(4),
-                    MockMvcResultMatchers.jsonPath("$.location.name").value("MyExchange"),
-                    MockMvcResultMatchers.jsonPath("$.location.entityName").value("Bestexchange")
+                    MockMvcResultMatchers.jsonPath("$.locationId").value(4)
                 )
             )
     }
@@ -131,11 +137,11 @@ class CurrencyTradeControllerTest {
             LocalDateTime.of(2021, 3, 24, 23, 44),
             location
         )
-        BDDMockito.given(currencyTradeService.save(any(), eq(5)))
+        BDDMockito.given(currencyTradeService.save(argWhere { it.id == null }))
             .willReturn(currencyTrade)
 
         client.perform(
-            MockMvcRequestBuilders.post("/locations/5/currency-trades/")
+            MockMvcRequestBuilders.post("/currency-trades/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -145,7 +151,8 @@ class CurrencyTradeControllerTest {
                        "pricePerBaseUnit": { "amount": 20, "currency": "EUR" },
                        "quantity": "1",
                        "fee": { "amount": 0.2, "currency": "EUR" },
-                       "dateTraded": "2021-03-24T23:44:00" }
+                       "dateTraded": "2021-03-24T23:44:00",
+                       "locationId": "5" }
                      """.trimMargin()
                 )
         )
@@ -171,7 +178,7 @@ class CurrencyTradeControllerTest {
             .willReturn(Optional.of(currencyTrade))
 
         client.perform(
-            MockMvcRequestBuilders.put("/locations/5/currency-trades/1")
+            MockMvcRequestBuilders.put("/currency-trades/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -207,7 +214,7 @@ class CurrencyTradeControllerTest {
             .willReturn(Optional.of(currencyTrade))
 
         client.perform(
-            MockMvcRequestBuilders.put("/locations/5/currency-trades/1")
+            MockMvcRequestBuilders.put("/currency-trades/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
@@ -231,34 +238,4 @@ class CurrencyTradeControllerTest {
             .andExpect(MockMvcResultMatchers.status().isOk)
     }
 
-    private fun matchCurrencyTrade(
-        id: Int,
-        baseCurrency: String,
-        quoteCurrency: String,
-        tradeType: String,
-        pricePerBaseUnitAmount: Int,
-        pricePerBaseUnitCurrency: String,
-        quantity: String,
-        feeAmount: Int,
-        feeCurrency: String,
-        dateTraded: String,
-        locationId: Int,
-        locationName: String,
-        locationEntityName: String,
-        position: Int = 0
-    ) = matchAll(
-        MockMvcResultMatchers.jsonPath("$[$position].id").value(id),
-        MockMvcResultMatchers.jsonPath("$[$position].baseCurrency").value(baseCurrency),
-        MockMvcResultMatchers.jsonPath("$[$position].quoteCurrency").value(quoteCurrency),
-        MockMvcResultMatchers.jsonPath("$[$position].tradeType").value(tradeType),
-        MockMvcResultMatchers.jsonPath("$[$position].pricePerBaseUnit.amount").value(pricePerBaseUnitAmount),
-        MockMvcResultMatchers.jsonPath("$[$position].pricePerBaseUnit.currency").value(pricePerBaseUnitCurrency),
-        MockMvcResultMatchers.jsonPath("$[$position].quantity").value(quantity),
-        MockMvcResultMatchers.jsonPath("$[$position].fee.amount").value(feeAmount),
-        MockMvcResultMatchers.jsonPath("$[$position].fee.currency").value(feeCurrency),
-        MockMvcResultMatchers.jsonPath("$[$position].dateTraded").value(dateTraded),
-        MockMvcResultMatchers.jsonPath("$[$position].location.id").value(locationId),
-        MockMvcResultMatchers.jsonPath("$[$position].location.name").value(locationName),
-        MockMvcResultMatchers.jsonPath("$[$position].location.entityName").value(locationEntityName)
-    )
 }

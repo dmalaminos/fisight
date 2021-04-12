@@ -111,7 +111,7 @@ class CurrencyTradeServiceTest {
             0.007,
             Money(3, Currency.EUR),
             LocalDateTime.of(2021, 3, 24, 23, 44),
-            null
+            4
         )
 
         val location = Location(4, "MyExchange", "Bestexchange", LocationType.BankAccount)
@@ -132,7 +132,7 @@ class CurrencyTradeServiceTest {
         whenever(currencyTradeRepository.save(currencyTrade)).thenReturn(currencyTrade.copy(id = 1))
 
 
-        val actual = currencyTradeService.save(currencyTradeDto, 4)
+        val actual = currencyTradeService.save(currencyTradeDto)
 
         verify(locationRepository).findById(location.id)
         verify(currencyTradeRepository).save(currencyTrade)
@@ -150,13 +150,13 @@ class CurrencyTradeServiceTest {
             0.007,
             Money(3, Currency.EUR),
             LocalDateTime.of(2021, 3, 24, 23, 44),
-            null
+            5
         )
 
         whenever(locationRepository.findById(5)).thenReturn(Optional.empty())
 
         Assertions.assertThrows(IllegalArgumentException::class.java) {
-            currencyTradeService.save(currencyTradeDto, 5)
+            currencyTradeService.save(currencyTradeDto)
         }
 
         verify(locationRepository).findById(5)

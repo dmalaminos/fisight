@@ -27,25 +27,21 @@ class CurrencyTradeController(
             .orElse(ResponseEntity.badRequest().build())
     }
 
-    @PostMapping("/locations/{locationId}/currency-trades/")
-    fun save(
-        @PathVariable("locationId") locationId: Int,
-        @RequestBody currencyTrade: CurrencyTradeDto
-    ): ResponseEntity<Any> {
-        val (currencyTradeId) = currencyTradeService.save(currencyTrade, locationId)
+    @PostMapping("/currency-trades/")
+    fun save(@RequestBody currencyTradeDto: CurrencyTradeDto): ResponseEntity<Any> {
+        val (currencyTradeId) = currencyTradeService.save(currencyTradeDto)
         return ResponseEntity.created(
             UriComponentsBuilder.fromPath("/currency-trades/{currencyTradeId}").buildAndExpand(currencyTradeId).toUri()
         ).build()
     }
 
-    @PutMapping("/locations/{locationId}/currency-trades/{id}")
+    @PutMapping("/currency-trades/{id}")
     fun update(
         @PathVariable("id") id: Int,
-        @PathVariable("locationId") locationId: Int,
         @RequestBody currencyTradeDto: CurrencyTradeDto
     ): ResponseEntity<Any> {
         if (currencyTradeDto.id == id) {
-            currencyTradeService.save(currencyTradeDto, locationId)
+            currencyTradeService.save(currencyTradeDto)
             return ResponseEntity.ok().build()
         }
         return ResponseEntity.badRequest().build()

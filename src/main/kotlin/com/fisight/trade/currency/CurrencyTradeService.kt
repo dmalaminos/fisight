@@ -23,8 +23,8 @@ class CurrencyTradeService(
         return currencyTradeRepository.findByLocation_IdAndDateTradedBefore(locationId, atDate)
     }
 
-    fun save(currencyTradeDto: CurrencyTradeDto, locationId: Int): CurrencyTrade {
-        val location = locationRepository.findById(locationId)
+    fun save(currencyTradeDto: CurrencyTradeDto): CurrencyTrade {
+        val location = locationRepository.findById(currencyTradeDto.locationId)
         if (location.isPresent) {
             val currencyTrade = mapper.toEntity(currencyTradeDto, location.get())
             return currencyTradeRepository.save(currencyTrade)

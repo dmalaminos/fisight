@@ -29,7 +29,7 @@ class CurrencyTradeMapper {
             currencyTrade.quantity,
             currencyTrade.fee,
             currencyTrade.dateTraded,
-            currencyTrade.location
+            currencyTrade.location.id
         )
     }
 }
